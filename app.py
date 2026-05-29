@@ -261,6 +261,203 @@ for col, label, val, sub in [
     col.markdown(f"""<div class="mini-kpi"><p class="ml">{label}</p><p class="mv">{val}</p>
     <p class="ms">{sub}</p></div>""", unsafe_allow_html=True)
 
+
+# ── Rozpad výpočtu úspory ─────────────────────────────────────────────────────
+st.markdown('<p class="section-title">ROZPAD VÝPOČTU ÚSPORY</p>', unsafe_allow_html=True)
+
+col_proc, col_dop, col_cnt = st.columns(3)
+
+# ── PROCES ──────────────────────────────────────────────────────────────────
+with col_proc:
+    t_old_s = r['n_total']*216 + r['n_pal_old']*300
+    t_new_s = (r['n_klt']*20 + r['n_klt']*15 + r['n_klts']*15
+               + r['n_pal']*216 + r['n_pal_new']*300)
+    t_old_h = t_old_s / 3600; t_new_h = t_new_s / 3600
+
+    st.markdown(f"""
+    <div style="background:#fff5f5;border:1.5px solid #feb2b2;border-radius:10px;padding:1rem 1.2rem">
+      <p style="font-size:11px;font-weight:700;color:#9b2c2c;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px">
+        🔧 PROCES — mzdové náklady</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <tr style="border-bottom:1px solid #fed7d7">
+          <td style="padding:4px 0;color:#555">Krok</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Starý</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Nový</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Naskladnenie</td>
+          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×20s</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_total']}×20s</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Uloženie/pikovanie</td>
+          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×8s</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klt']}×15s</td>
+        </tr>
+        <tr style="background:#fff0f0">
+          <td style="padding:3px 0;color:#9b2c2c;font-weight:600">Zozbieranie ⚠️</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_total']}×180s</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Skenovanie</td>
+          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×8s</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Sort (15s/KLT)</td>
+          <td style="padding:3px 0;text-align:right;color:#333">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klts']}×15s</td>
+        </tr>
+        <tr style="border-top:1.5px solid #feb2b2">
+          <td style="padding:5px 0;color:#333;font-weight:600">Čas celkom</td>
+          <td style="padding:5px 0;text-align:right;color:#9b2c2c;font-weight:600">{t_old_h:.1f} hod</td>
+          <td style="padding:5px 0;text-align:right;color:#276749;font-weight:600">{t_new_h:.1f} hod</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Priame ({rate:.0f} €/hod)</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['c_dir_old']:,.0f} €</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['c_dir_new']:,.0f} €</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Opportunity cost</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['c_oc_old']:,.0f} €</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['c_oc_new']:,.0f} €</td>
+        </tr>
+        <tr style="border-top:1.5px solid #feb2b2">
+          <td style="padding:5px 0;font-weight:700;color:#333">Proces spolu</td>
+          <td style="padding:5px 0;text-align:right;font-weight:700;color:#9b2c2c">{r['c_mzd_old']:,.0f} €</td>
+          <td style="padding:5px 0;text-align:right;font-weight:700;color:#276749">{r['c_mzd_new']:,.0f} €</td>
+        </tr>
+      </table>
+      <div style="background:#9b2c2c;border-radius:6px;padding:6px 10px;margin-top:10px;text-align:center">
+        <span style="color:white;font-weight:700;font-size:14px">Úspora proces: {r['sav_mzd']:,.0f} €
+        &nbsp;·&nbsp; {round(r['sav_mzd']*czk):,.0f} Kč</span>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ── DOPRAVA ─────────────────────────────────────────────────────────────────
+with col_dop:
+    n_pal_old_bez = round(r['n_pal_old'] / FILL_FACTOR)  # bez fill korekcie
+    st.markdown(f"""
+    <div style="background:#fffbeb;border:1.5px solid #fbd38d;border-radius:10px;padding:1rem 1.2rem">
+      <p style="font-size:11px;font-weight:700;color:#744210;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px">
+        🚛 DOPRAVA — náklady na palety</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <tr style="border-bottom:1px solid #fbd38d">
+          <td style="padding:4px 0;color:#555">Parameter</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Starý</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Nový</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Kapacita palety</td>
+          <td style="padding:3px 0;text-align:right;color:#333">{PAL_M3_OLD:.3f} m³<br><span style="font-size:10px;color:#888">(fill 70%)</span></td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{PAL_M3_NEW:.2f} m³<br><span style="font-size:10px;color:#888">(KLT = 100%)</span></td>
+        </tr>
+        <tr style="background:#fffde7">
+          <td style="padding:3px 0;color:#744210;font-weight:600">Počet paliet</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_pal_old']:,}</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_pal_new']:,}</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#555;font-size:11px">&nbsp;&nbsp;bez fill korekcie</td>
+          <td style="padding:3px 0;text-align:right;color:#888;font-size:11px">{n_pal_old_bez:,}</td>
+          <td style="padding:3px 0;text-align:right;color:#888;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#555;font-size:11px">&nbsp;&nbsp;fill korekcia</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-size:11px">+{r['n_pal_old']-n_pal_old_bez:,} pal.</td>
+          <td style="padding:3px 0;text-align:right;color:#888;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Ušetrené palety</td>
+          <td colspan="2" style="padding:3px 0;text-align:right;color:#276749;font-weight:600">−{r['n_pal_old']-r['n_pal_new']:,} paliet</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Cena / paleta</td>
+          <td colspan="2" style="padding:3px 0;text-align:right;color:#333">{price_czk:.0f} Kč = {price_czk/czk:.4f} €</td>
+        </tr>
+        <tr style="border-top:1.5px solid #fbd38d">
+          <td style="padding:5px 0;font-weight:700;color:#333">Doprava spolu</td>
+          <td style="padding:5px 0;text-align:right;font-weight:700;color:#9b2c2c">{r['c_pal_old']:,.0f} €</td>
+          <td style="padding:5px 0;text-align:right;font-weight:700;color:#276749">{r['c_pal_new']:,.0f} €</td>
+        </tr>
+      </table>
+      <div style="background:#744210;border-radius:6px;padding:6px 10px;margin-top:10px;text-align:center">
+        <span style="color:white;font-weight:700;font-size:14px">Úspora doprava: {r['sav_pal']:,.0f} €
+        &nbsp;·&nbsp; {round(r['sav_pal']*czk):,.0f} Kč</span>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ── POČTY ───────────────────────────────────────────────────────────────────
+with col_cnt:
+    st.markdown(f"""
+    <div style="background:#f0fff4;border:1.5px solid #9ae6b4;border-radius:10px;padding:1rem 1.2rem">
+      <p style="font-size:11px;font-weight:700;color:#276749;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px">
+        📦 POČTY — záznamy a objem</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <tr style="border-bottom:1px solid #9ae6b4">
+          <td style="padding:4px 0;color:#555">Ukazovateľ</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Starý</td>
+          <td style="padding:4px 0;text-align:right;color:#555">Nový</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Záznamy celkom</td>
+          <td colspan="2" style="padding:3px 0;text-align:right;color:#333;font-weight:600">{r['n_total']:,}</td>
+        </tr>
+        <tr style="background:#f0fff4">
+          <td style="padding:3px 0;color:#276749;font-weight:600">→ KLT záznamy</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_klt']:,}</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#555;font-size:11px">&nbsp;&nbsp;KLT kusov</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-size:11px">{r['n_klts']:,} KLT</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#555;font-size:11px">&nbsp;&nbsp;KLT záz. (%)</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-size:11px">{round(r['n_klt']/r['n_total']*100,1)}%</td>
+        </tr>
+        <tr style="background:#f0fff4">
+          <td style="padding:3px 0;color:#744210;font-weight:600">→ Paleta záznamy</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">{r['n_pal']:,}</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#555;font-size:11px">&nbsp;&nbsp;Paleta záz. (%)</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-size:11px">{round(r['n_pal']/r['n_total']*100,1)}%</td>
+        </tr>
+        <tr style="border-top:1px solid #9ae6b4">
+          <td style="padding:4px 0;color:#333">Palety starý</td>
+          <td style="padding:4px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_pal_old']:,}</td>
+          <td style="padding:4px 0;text-align:right;color:#888">—</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Palety nový</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_pal_new']:,}</td>
+        </tr>
+        <tr style="border-top:1.5px solid #9ae6b4">
+          <td style="padding:5px 0;font-weight:700;color:#333">Rozdiel paliet</td>
+          <td colspan="2" style="padding:5px 0;text-align:right;font-weight:700;color:#276749">−{r['n_pal_old']-r['n_pal_new']:,} paliet</td>
+        </tr>
+      </table>
+      <div style="background:#276749;border-radius:6px;padding:6px 10px;margin-top:10px;text-align:center">
+        <span style="color:white;font-weight:700;font-size:14px">ÚSPORA SPOLU: {r['sav']:,.0f} €
+        &nbsp;·&nbsp; {r['sav_czk']:,.0f} Kč</span>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 # ── Monthly ────────────────────────────────────────────────────────────────────
 st.markdown('<p class="section-title">MESAČNÝ PREHĽAD</p>', unsafe_allow_html=True)
 
