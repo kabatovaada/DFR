@@ -152,39 +152,34 @@ with st.sidebar:
     czk       = st.number_input("Kurz EUR/CZK", value=24.29, step=0.01)
 
     st.markdown("---")
-    st.markdown("### 📂 Nahrať súbor")
-    uploaded = st.file_uploader("Zošit2.xlsx", type=['xlsx'])
+    st.caption("📂 Dáta: Zošit2.xlsx (pribalené)")
 
     st.markdown("---")
     st.caption(f"Paleta: {KLT_PER_PAL} KLT = {PAL_M3_NEW:.2f} m³  \nStarý fill: 70 % → {PAL_M3_OLD:.3f} m³  \nFiltre: SPO + DFR")
 
 # ── Load data ──────────────────────────────────────────────────────────────────
+import os
+
+DATA_FILE = os.path.join(os.path.dirname(__file__), "Zošit2.xlsx")
+
 df_raw = None
-if uploaded:
-    try:
-        df = pd.read_excel(uploaded, header=None)
-        df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
-        df_raw = df[(df['Geosize']=='SPO') & (df['Typ distribuce']=='DFR')].copy()
-        if len(df_raw) == 0:
-            st.error("Súbor neobsahuje záznamy SPO + DFR.")
-            df_raw = None
-    except Exception as e:
-        st.error(f"Chyba: {e}"); df_raw = None
+try:
+    df = pd.read_excel(DATA_FILE, header=None)
+    df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
+    df_raw = df[(df['Geosize']=='SPO') & (df['Typ distribuce']=='DFR')].copy()
+    if len(df_raw) == 0:
+        st.error("Súbor neobsahuje záznamy SPO + DFR.")
+        df_raw = None
+except FileNotFoundError:
+    st.error("Súbor Zošit2.xlsx nebol nájdený. Uistite sa, že je v rovnakom priečinku ako app.py.")
+    df_raw = None
+except Exception as e:
+    st.error(f"Chyba pri načítaní: {e}"); df_raw = None
 
 # ── Header ─────────────────────────────────────────────────────────────────────
 st.markdown("# 📦 KLT Plánovanie prepravy")
 
 if df_raw is None:
-    st.info("👈 Nahrajte súbor **Zošit2.xlsx** v ľavom paneli.")
-    st.markdown("---")
-    st.markdown("**Čo uvidíte po nahraní súboru:**")
-    cols = st.columns(3)
-    for col, (icon, title, desc) in zip(cols, [
-        ("💰", "Celková úspora", "Veľká zelená karta s úsporou v € aj Kč — okamžite vidno koľko sa ušetrí"),
-        ("📊", "Rozpad nákladov", "Proces vs Doprava — kde presne úspora vzniká"),
-        ("📅", "Mesačný prehľad", "Tabuľka a grafy po mesiacoch + citlivosť prahu"),
-    ]):
-        col.markdown(f"### {icon} {title}\n{desc}")
     st.stop()
 
 # ── Compute ────────────────────────────────────────────────────────────────────
