@@ -99,8 +99,8 @@ def compute(df_raw, thresh, rate, czk, price_czk):
     if len(pg)>0: pg['np'] = pg['Objem [m3]'].apply(lambda v: math.ceil(v/PAL_M3_NEW))
     n_pal_new = int(pg['np'].sum()) if len(pg)>0 else 0
 
-    t_old = n_total*216 + n_pal_old*300
-    t_new = n_klt*20 + n_klt*15 + n_klts*15 + n_pal*216 + n_pal_new*300
+    t_old = n_total*223 + n_pal_old*300  # 20+15+180+8=223s
+    t_new = n_klt*20 + n_klt*8 + n_klts*15 + n_pal*223 + n_pal_new*300  # KLT:20+8+15s/KLT, Pal:223s
 
     c_dir_old=dir_cost(t_old,rate); c_oc_old=opp_cost(t_old,rate)
     c_dir_new=dir_cost(t_new,rate); c_oc_new=opp_cost(t_new,rate)
@@ -146,7 +146,7 @@ def compute(df_raw, thresh, rate, czk, price_czk):
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## ⚙️ Parametre")
-    thresh    = st.slider("Prah KLT / Paleta (ks)", 1, 100, 20)
+    thresh    = st.slider("Limit spracovania cez AS (ks)", 1, 100, 20)
     price_czk = st.number_input("Cena za paletu (Kč)", value=561.0, step=10.0)
     rate      = st.number_input("Sadzba práce (€/hod)", value=15.0, step=0.5)
     czk       = st.number_input("Kurz EUR/CZK", value=24.29, step=0.01)
@@ -160,26 +160,66 @@ with st.sidebar:
 # ── Load data ──────────────────────────────────────────────────────────────────
 import os
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), "Zošit2.xlsx")
+BASE = os.path.dirname(__file__)
 
-df_raw = None
-try:
-    df = pd.read_excel(DATA_FILE, header=None)
-    df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
-    df_raw = df[(df['Geosize']=='SPO') & (df['Typ distribuce']=='DFR')].copy()
-    if len(df_raw) == 0:
-        st.error("Súbor neobsahuje záznamy SPO + DFR.")
-        df_raw = None
-except FileNotFoundError:
-    st.error("Súbor Zošit2.xlsx nebol nájdený. Uistite sa, že je v rovnakom priečinku ako app.py.")
-    df_raw = None
-except Exception as e:
-    st.error(f"Chyba pri načítaní: {e}"); df_raw = None
+DATA_SOURCES = [
+    {"file": "Zošit2.xlsx",                    "header": None, "label": "Zošit2 (hist.)"},
+    {"file": "DFR_Q1_2026_CZLC4-SKLC3.xlsx",  "header": 2,    "label": "CZLC4→SKLC3 Q1 2026"},
+    {"file": "DFR_Q1_2026_SKLC3-CZLC4.xlsx",  "header": 2,    "label": "SKLC3→CZLC4 Q1 2026"},
+]
+
+def load_source(src):
+    fpath = os.path.join(BASE, src["file"])
+    if not os.path.exists(fpath):
+        return None, src["label"]
+    if src["header"] is None:
+        df = pd.read_excel(fpath, header=None)
+        df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
+    else:
+        df = pd.read_excel(fpath, header=src["header"])
+    df['Počet ks']   = pd.to_numeric(df['Počet ks'],   errors='coerce').fillna(0)
+    df['Objem [m3]'] = pd.to_numeric(df['Objem [m3]'], errors='coerce').fillna(0)
+    filtered = df[(df['Geosize']=='SPO') & (df['Typ distribuce']=='DFR')].copy()
+    filtered['_source'] = src["label"]
+    return filtered if len(filtered) > 0 else None, src["label"]
+
+# Load all sources
+frames = []; loaded = []; missing = []
+for src in DATA_SOURCES:
+    df_s, label = load_source(src)
+    if df_s is not None:
+        frames.append(df_s); loaded.append(label)
+    else:
+        missing.append(label)
+
+df_raw = pd.concat(frames, ignore_index=True) if frames else None
 
 # ── Header ─────────────────────────────────────────────────────────────────────
 st.markdown("# 📦 KLT Plánovanie prepravy")
 
+# Source info bar
+if frames:
+    src_parts = []
+    for src_label in loaded:
+        n = int((df_raw['_source'] == src_label).sum())
+        src_parts.append(f"**{src_label}**: {n:,} záz.")
+    st.markdown(
+        '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;'
+        'padding:8px 14px;font-size:12px;color:#3730a3;margin-bottom:8px">'
+        '📂 Načítané zdroje: ' + '  ·  '.join(src_parts) + '</div>',
+        unsafe_allow_html=True
+    )
+
+# Show data source status in sidebar
+with st.sidebar:
+    st.markdown("### 📂 Zdroje dát")
+    for lbl in loaded:
+        st.markdown(f"✅ {lbl}")
+    for lbl in missing:
+        st.markdown(f"⚠️ {lbl} *(nenájdený)*")
+
 if df_raw is None:
+    st.error("Žiadne dátové súbory sa nenašli. Skontrolujte priečinok.")
     st.stop()
 
 # ── Compute ────────────────────────────────────────────────────────────────────
@@ -237,7 +277,7 @@ with col_costs:
     st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
     st.markdown(f"""
     <div class="cost-box new">
-        <p class="clabel">🟢 Nový proces  (prah {thresh} ks)</p>
+        <p class="clabel">🟢 Nový proces  (limit {thresh} ks)</p>
         <p class="cval">{r['c_tot_new']:,.0f} €</p>
         <p class="csub">{r['c_tot_new']*czk:,.0f} Kč</p>
         <hr style="border-color:#5DCAA5;margin:10px 0">
@@ -291,14 +331,19 @@ with col_proc:
           <td style="padding:3px 0;text-align:right;color:#276749">{r['n_total']}×20s</td>
         </tr>
         <tr>
-          <td style="padding:3px 0;color:#333">Uloženie/pikovanie</td>
-          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×8s</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klt']}×15s</td>
+          <td style="padding:3px 0;color:#333">Uloženie do regálu</td>
+          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×15s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
         </tr>
         <tr style="background:#fff0f0">
           <td style="padding:3px 0;color:#9b2c2c;font-weight:600">Zozbieranie ⚠️</td>
           <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_total']}×180s</td>
           <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#276749;font-weight:600">Pikovanie do BINu</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_klt']}×8s</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Skenovanie</td>
@@ -311,9 +356,14 @@ with col_proc:
           <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klts']}×15s</td>
         </tr>
         <tr style="border-top:1.5px solid #feb2b2">
-          <td style="padding:5px 0;color:#333;font-weight:600">Čas celkom</td>
-          <td style="padding:5px 0;text-align:right;color:#9b2c2c;font-weight:600">{t_old_h:.1f} hod</td>
-          <td style="padding:5px 0;text-align:right;color:#276749;font-weight:600">{t_new_h:.1f} hod</td>
+          <td style="padding:5px 0;color:#333;font-weight:600">Čas/záz. (operácie)</td>
+          <td style="padding:5px 0;text-align:right;color:#9b2c2c;font-weight:600">223 s (3,7 min)</td>
+          <td style="padding:5px 0;text-align:right;color:#276749;font-weight:600">43s + 15s/KLT sort</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 0;color:#333">Čas celkom</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{t_old_h:.1f} hod</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{t_new_h:.1f} hod</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Priame ({rate:.0f} €/hod)</td>
@@ -475,36 +525,109 @@ with tab1:
         st.bar_chart(chart_costs, color=['#C0392B','#1E5631'], height=280)
 
 with tab2:
-    cols_show = ['Mesiac','Záznamy','KLT záz.','Pal. záz.','Palety starý','Palety nový',
-                 'Nákl. starý (€)','Nákl. nový (€)','Úspora (€)','Úspora (Kč)']
-    disp = mdf[cols_show].copy()
-    max_sav = disp['Úspora (€)'].max()
-    min_sav = disp['Úspora (€)'].min()
+    # Header groups
+    hdr_html = """
+    <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0;margin-top:4px">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr>
+          <th rowspan="2" style="padding:7px 10px;background:#2d3748;color:#fff;font-weight:600;border-right:1px solid #4a5568">Mesiac</th>
+          <th rowspan="2" style="padding:7px 10px;background:#2d3748;color:#fff;font-weight:600;border-right:1px solid #4a5568;white-space:nowrap">Záznamy</th>
+          <th colspan="3" style="padding:7px 10px;background:#2b4c7e;color:#fff;font-weight:600;text-align:center;border-right:1px solid #4a5568">KLT</th>
+          <th colspan="3" style="padding:7px 10px;background:#744210;color:#fff;font-weight:600;text-align:center;border-right:1px solid #4a5568">Palety</th>
+          <th colspan="2" style="padding:7px 10px;background:#9b2c2c;color:#fff;font-weight:600;text-align:center;border-right:1px solid #4a5568">Náklady starý</th>
+          <th colspan="2" style="padding:7px 10px;background:#276749;color:#fff;font-weight:600;text-align:center;border-right:1px solid #4a5568">Náklady nový</th>
+          <th colspan="3" style="padding:7px 10px;background:#1E5631;color:#fff;font-weight:600;text-align:center">Úspora</th>
+        </tr>
+        <tr>
+          <th style="padding:5px 8px;background:#3a6186;color:#fff;font-weight:500;white-space:nowrap">záznamy</th>
+          <th style="padding:5px 8px;background:#3a6186;color:#fff;font-weight:500;white-space:nowrap">KLT ks</th>
+          <th style="padding:5px 8px;background:#3a6186;color:#fff;font-weight:500;white-space:nowrap;border-right:1px solid #4a5568">záz. %</th>
+          <th style="padding:5px 8px;background:#975a16;color:#fff;font-weight:500;white-space:nowrap">starý</th>
+          <th style="padding:5px 8px;background:#975a16;color:#fff;font-weight:500;white-space:nowrap">nový</th>
+          <th style="padding:5px 8px;background:#975a16;color:#fff;font-weight:500;white-space:nowrap;border-right:1px solid #4a5568">rozdiel</th>
+          <th style="padding:5px 8px;background:#c53030;color:#fff;font-weight:500;white-space:nowrap">mzdové</th>
+          <th style="padding:5px 8px;background:#c53030;color:#fff;font-weight:500;white-space:nowrap;border-right:1px solid #4a5568">doprava</th>
+          <th style="padding:5px 8px;background:#2f855a;color:#fff;font-weight:500;white-space:nowrap">mzdové</th>
+          <th style="padding:5px 8px;background:#2f855a;color:#fff;font-weight:500;white-space:nowrap;border-right:1px solid #4a5568">doprava</th>
+          <th style="padding:5px 8px;background:#276749;color:#fff;font-weight:500;white-space:nowrap">proces €</th>
+          <th style="padding:5px 8px;background:#276749;color:#fff;font-weight:500;white-space:nowrap">doprava €</th>
+          <th style="padding:5px 8px;background:#1E5631;color:#fff;font-weight:700;white-space:nowrap">SPOLU €</th>
+        </tr>
+      </thead>
+      <tbody>"""
 
-    header = "".join(f'<th style="padding:7px 10px;background:#2d3748;color:#fff;font-size:12px;font-weight:600;white-space:nowrap">{c}</th>' for c in cols_show)
     rows_html = ""
-    for _, row in disp.iterrows():
+    totals = {k: 0 for k in ['Záznamy','KLT záz.','Palety starý','Palety nový',
+                               'up_proc','up_dop','up_tot']}
+    max_sav = mdf['Úspora (€)'].max()
+    min_sav = mdf['Úspora (€)'].min()
+
+    for _, row in mdf.iterrows():
         is_partial = row['Mesiac'] in ('2025-09','2026-05')
-        bg = "#fffbe6" if is_partial else ("#f0fff4" if row['Úspora (€)'] == max_sav else ("#fff5f5" if row['Úspora (€)'] == min_sav else "#ffffff"))
-        def fmt(col, val):
-            if col in ('Nákl. starý (€)','Nákl. nový (€)','Úspora (€)'): return f"{val:,.2f} €"
-            if col == 'Úspora (Kč)': return f"{val:,.0f} Kč"
-            return str(val)
-        cells = ""
-        for col in cols_show:
-            fc = "#276749" if col == 'Úspora (€)' and not is_partial else ("#9b2c2c" if col == 'Nákl. starý (€)' else "#2d3748")
-            fw = "700" if col in ('Úspora (€)','Úspora (Kč)') else "400"
-            cells += f'<td style="padding:6px 10px;color:{fc};font-weight:{fw};font-size:12px;border-bottom:1px solid #e2e8f0">{fmt(col, row[col])}</td>'
+        is_best    = row['Úspora (€)'] == max_sav
+        is_worst   = row['Úspora (€)'] == min_sav
+        bg = "#fffde7" if is_partial else ("#f0fff4" if is_best else ("#fff5f5" if is_worst else "#ffffff"))
+
+        n_klt_pct  = round(row['KLT záz.']/row['Záznamy']*100,0) if row['Záznamy']>0 else 0
+        pal_diff   = row['Palety starý'] - row['Palety nový']
+
+        # back-calculate mzdové and doprava costs per month from stored values
+        sav_proc   = row['Úspora proces (€)']
+        sav_dop    = row['Úspora doprava (€)']
+        nákl_st_mzd = row['Nákl. starý (€)'] - row['Pal. nákl. starý (€)'] if 'Pal. nákl. starý (€)' in mdf.columns else row['Nákl. starý (€)'] - row['Palety starý'] * (price_czk/czk)
+        nákl_st_dop = row['Palety starý'] * (price_czk/czk)
+        nákl_nv_mzd = row['Nákl. nový (€)'] - row['Pal. nákl. nový (€)'] if 'Pal. nákl. nový (€)' in mdf.columns else row['Nákl. nový (€)'] - row['Palety nový'] * (price_czk/czk)
+        nákl_nv_dop = row['Palety nový'] * (price_czk/czk)
+
+        part_note = " *" if is_partial else ""
+        cells = f"""
+          <td style="padding:6px 8px;color:#2d3748;font-weight:{'700' if is_partial else '400'};border-right:1px solid #e2e8f0;white-space:nowrap">{row['Mesiac']}{part_note}</td>
+          <td style="padding:6px 8px;color:#2d3748;text-align:right;border-right:1px solid #e2e8f0">{row['Záznamy']:,}</td>
+          <td style="padding:6px 8px;color:#2b4c7e;text-align:right">{row['KLT záz.']:,}</td>
+          <td style="padding:6px 8px;color:#2b4c7e;text-align:right">{row['KLT ks']:,}</td>
+          <td style="padding:6px 8px;color:#2b4c7e;text-align:right;border-right:1px solid #e2e8f0">{n_klt_pct:.0f}%</td>
+          <td style="padding:6px 8px;color:#9b2c2c;text-align:right">{row['Palety starý']:,}</td>
+          <td style="padding:6px 8px;color:#276749;text-align:right">{row['Palety nový']:,}</td>
+          <td style="padding:6px 8px;color:#744210;text-align:right;font-weight:600;border-right:1px solid #e2e8f0">−{pal_diff:,}</td>
+          <td style="padding:6px 8px;color:#9b2c2c;text-align:right">{nákl_st_mzd:,.0f} €</td>
+          <td style="padding:6px 8px;color:#9b2c2c;text-align:right;border-right:1px solid #e2e8f0">{nákl_st_dop:,.0f} €</td>
+          <td style="padding:6px 8px;color:#276749;text-align:right">{nákl_nv_mzd:,.0f} €</td>
+          <td style="padding:6px 8px;color:#276749;text-align:right;border-right:1px solid #e2e8f0">{nákl_nv_dop:,.0f} €</td>
+          <td style="padding:6px 8px;color:#276749;text-align:right">{sav_proc:,.0f} €</td>
+          <td style="padding:6px 8px;color:#744210;text-align:right">{sav_dop:,.0f} €</td>
+          <td style="padding:6px 8px;color:#1E5631;text-align:right;font-weight:700">{row['Úspora (€)']:,.0f} €</td>"""
+
         rows_html += f'<tr style="background:{bg}">{cells}</tr>'
 
-    st.markdown(f"""
-    <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0">
-    <table style="width:100%;border-collapse:collapse">
-      <thead><tr>{header}</tr></thead>
-      <tbody>{rows_html}</tbody>
-    </table>
-    </div>
-    """, unsafe_allow_html=True)
+        totals['Záznamy']      += row['Záznamy']
+        totals['KLT záz.']     += row['KLT záz.']
+        totals['Palety starý'] += row['Palety starý']
+        totals['Palety nový']  += row['Palety nový']
+        totals['up_proc']      += sav_proc
+        totals['up_dop']       += sav_dop
+        totals['up_tot']       += row['Úspora (€)']
+
+    # Totals row
+    tot_pal_diff = totals['Palety starý'] - totals['Palety nový']
+    rows_html += f"""<tr style="background:#1E5631">
+      <td style="padding:7px 8px;color:#fff;font-weight:700;border-right:1px solid #2f855a">SPOLU</td>
+      <td style="padding:7px 8px;color:#fff;font-weight:700;text-align:right;border-right:1px solid #2f855a">{totals['Záznamy']:,}</td>
+      <td style="padding:7px 8px;color:#9ae6b4;text-align:right;font-weight:600">{totals['KLT záz.']:,}</td>
+      <td style="padding:7px 8px;color:#9ae6b4;text-align:right">—</td>
+      <td style="padding:7px 8px;color:#9ae6b4;text-align:right;border-right:1px solid #2f855a">—</td>
+      <td style="padding:7px 8px;color:#fbd38d;text-align:right;font-weight:600">{totals['Palety starý']:,}</td>
+      <td style="padding:7px 8px;color:#9ae6b4;text-align:right;font-weight:600">{totals['Palety nový']:,}</td>
+      <td style="padding:7px 8px;color:#fbd38d;text-align:right;font-weight:700;border-right:1px solid #2f855a">−{tot_pal_diff:,}</td>
+      <td colspan="2" style="padding:7px 8px;color:#fbd38d;text-align:right;border-right:1px solid #2f855a">—</td>
+      <td colspan="2" style="padding:7px 8px;color:#9ae6b4;text-align:right;border-right:1px solid #2f855a">—</td>
+      <td style="padding:7px 8px;color:#fff;text-align:right;font-weight:600">{totals['up_proc']:,.0f} €</td>
+      <td style="padding:7px 8px;color:#fbd38d;text-align:right;font-weight:600">{totals['up_dop']:,.0f} €</td>
+      <td style="padding:7px 8px;color:#fff;text-align:right;font-weight:700;font-size:13px">{totals['up_tot']:,.0f} €</td>
+    </tr>"""
+
+    st.markdown(hdr_html + rows_html + "</tbody></table></div>", unsafe_allow_html=True)
+    st.caption("* Neúplné mesiace (sep 2025, máj 2026)  ·  Zelená = najväčšia úspora  ·  Ružová = najmenšia")
 
 # ── Sensitivity ────────────────────────────────────────────────────────────────
 st.markdown('<p class="section-title">CITLIVOSŤ PRAHU</p>', unsafe_allow_html=True)
