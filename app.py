@@ -1,12 +1,8 @@
 import streamlit as st
 import pandas as pd
-import openpyxl
 import math
-import io
-import json
 from datetime import datetime
 
-# ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="KLT Plánovanie prepravy",
     page_icon="📦",
@@ -14,403 +10,322 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── Styling ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-.block-container { padding-top: 1.5rem; }
-.metric-card {
-    background: #f0f4f8;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    border-left: 4px solid #185FA5;
+.block-container { padding-top: 1rem; max-width: 1400px; }
+
+.savings-hero {
+    background: linear-gradient(135deg, #1E5631 0%, #2E7D32 100%);
+    border-radius: 14px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.5rem;
 }
-.metric-card.green { border-left-color: #1E5631; background: #f0faf3; }
-.metric-card.red   { border-left-color: #A32D2D; background: #fdf0f0; }
-.metric-card.amber { border-left-color: #854F0B; background: #fdf7f0; }
-.metric-label { font-size: 12px; color: #666; margin: 0; }
-.metric-value { font-size: 22px; font-weight: 600; margin: 4px 0 0; }
+.savings-hero .sh-label  { font-size: 14px; color: #d4edda; margin: 0 0 4px; }
+.savings-hero .sh-amount { font-size: 52px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.1; }
+.savings-hero .sh-sub    { font-size: 20px; color: #d4edda; margin: 4px 0 0; }
+.savings-hero .sh-pct    {
+    background: rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 4px 14px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.cost-box { border-radius: 10px; padding: 1.1rem 1.3rem; }
+.cost-box.old { background: #fff5f5; border: 1.5px solid #feb2b2; }
+.cost-box.new { background: #f0fff4; border: 1.5px solid #9ae6b4; }
+.cost-box .clabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin: 0 0 6px; }
+.cost-box.old .clabel { color: #9b2c2c; }
+.cost-box.new .clabel { color: #276749; }
+.cost-box .cval  { font-size: 30px; font-weight: 700; margin: 0; line-height: 1.1; }
+.cost-box.old .cval { color: #9b2c2c; }
+.cost-box.new .cval { color: #276749; }
+.cost-box .csub  { font-size: 14px; color: #555; margin: 4px 0 0; }
+.cost-box .cdetail { font-size: 12px; color: #666; margin: 3px 0; }
+
+.breakdown-row { margin: 8px 0; }
+.breakdown-label { font-size: 12px; color: #333; display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 500; }
+.bar-track { background: #e2e8f0; border-radius: 4px; height: 22px; overflow: hidden; }
+.bar-fill  { height: 22px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; }
+
+.mini-kpi { background: #f7fafc; border-radius: 8px; padding: 0.7rem 0.9rem; border: 1px solid #e2e8f0; text-align: center; }
+.mini-kpi .ml { font-size: 11px; color: #718096; margin: 0 0 3px; }
+.mini-kpi .mv { font-size: 18px; font-weight: 700; color: #2d3748; margin: 0; }
+.mini-kpi .ms { font-size: 10px; color: #a0aec0; margin: 2px 0 0; }
+
 .section-title {
-    font-size: 13px; font-weight: 600; color: #1F3864;
-    border-bottom: 2px solid #1F3864; padding-bottom: 4px;
-    margin: 1.5rem 0 0.75rem;
+    font-size: 12px; font-weight: 700; color: #2d3748; text-transform: uppercase;
+    letter-spacing: .8px; border-bottom: 2px solid #4a5568;
+    padding-bottom: 4px; margin: 1.5rem 0 0.75rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-KLT_M3       = 0.05
-KLT_PER_PAL  = 24
-PAL_M3_NEW   = KLT_PER_PAL * KLT_M3        # 1.2 m³
-FILL_FACTOR  = 0.70
-PAL_M3_OLD   = PAL_M3_NEW * FILL_FACTOR     # 0.84 m³
-RATE         = 15.0
-CZK          = 24.29
-VYKON_STD    = 70
-VYKON_DIST   = 60
-PRICE_PAL_CZK = 561.0
-PRICE_PAL_EUR = round(PRICE_PAL_CZK / CZK, 4)
+# ── Constants ──────────────────────────────────────────────────────────────────
+KLT_M3        = 0.05
+KLT_PER_PAL   = 24
+PAL_M3_NEW    = KLT_PER_PAL * KLT_M3
+FILL_FACTOR   = 0.70
+PAL_M3_OLD    = PAL_M3_NEW * FILL_FACTOR
+VYKON_STD     = 70
+VYKON_DIST    = 60
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-def dir_cost(t_s):  return (t_s / 3600) * RATE
-def opp_cost(t_s):  return (t_s / 3600) * (VYKON_STD - VYKON_DIST) / VYKON_STD * RATE
+def dir_cost(t_s, rate):   return (t_s / 3600) * rate
+def opp_cost(t_s, rate):   return (t_s / 3600) * (VYKON_STD - VYKON_DIST) / VYKON_STD * rate
 
-def compute_all(df_raw, thresh):
+def compute(df_raw, thresh, rate, czk, price_czk):
+    price_eur = price_czk / czk
     df = df_raw.copy()
     df['Počet ks']   = pd.to_numeric(df['Počet ks'],   errors='coerce').fillna(0)
     df['Objem [m3]'] = pd.to_numeric(df['Objem [m3]'], errors='coerce').fillna(0)
     df['preprava']   = df['Počet ks'].apply(lambda x: 'Paleta' if x >= thresh else 'KLT')
     df['month']      = pd.to_datetime(df['Date']).dt.strftime('%Y-%m')
 
-    klt = df[df['preprava'] == 'KLT']
-    pal = df[df['preprava'] == 'Paleta']
-    n_total = len(df); n_klt = len(klt); n_pal = len(pal)
+    klt = df[df['preprava']=='KLT']; pal = df[df['preprava']=='Paleta']
+    n_total=len(df); n_klt=len(klt); n_pal=len(pal)
 
-    old_grp = df.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index()
-    old_grp['n_pal'] = old_grp['Objem [m3]'].apply(lambda v: math.ceil(v / PAL_M3_OLD))
-    n_pal_old = int(old_grp['n_pal'].sum())
+    og = df.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index()
+    og['np'] = og['Objem [m3]'].apply(lambda v: math.ceil(v / PAL_M3_OLD))
+    n_pal_old = int(og['np'].sum())
 
-    kg = klt.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if n_klt > 0 else pd.DataFrame({'Objem [m3]': []})
-    if len(kg) > 0: kg['nk'] = kg['Objem [m3]'].apply(lambda v: math.ceil(v / KLT_M3))
-    n_klts = int(kg['nk'].sum()) if len(kg) > 0 else 0
+    kg = klt.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if n_klt>0 else pd.DataFrame({'Objem [m3]':[]})
+    if len(kg)>0: kg['nk'] = kg['Objem [m3]'].apply(lambda v: math.ceil(v/KLT_M3))
+    n_klts = int(kg['nk'].sum()) if len(kg)>0 else 0
 
-    pg = pal.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if n_pal > 0 else pd.DataFrame({'Objem [m3]': []})
-    if len(pg) > 0: pg['np'] = pg['Objem [m3]'].apply(lambda v: math.ceil(v / PAL_M3_NEW))
-    n_pal_new = int(pg['np'].sum()) if len(pg) > 0 else 0
+    pg = pal.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if n_pal>0 else pd.DataFrame({'Objem [m3]':[]})
+    if len(pg)>0: pg['np'] = pg['Objem [m3]'].apply(lambda v: math.ceil(v/PAL_M3_NEW))
+    n_pal_new = int(pg['np'].sum()) if len(pg)>0 else 0
 
-    t_old = n_total * 216 + n_pal_old * 300
-    t_new = n_klt * 20 + n_klt * 15 + n_klts * 15 + n_pal * 216 + n_pal_new * 300
+    t_old = n_total*216 + n_pal_old*300
+    t_new = n_klt*20 + n_klt*15 + n_klts*15 + n_pal*216 + n_pal_new*300
 
-    c_mzd_old = dir_cost(t_old) + opp_cost(t_old)
-    c_mzd_new = dir_cost(t_new) + opp_cost(t_new)
-    c_pal_old = n_pal_old * PRICE_PAL_EUR
-    c_pal_new = n_pal_new * PRICE_PAL_EUR
-    c_tot_old = round(c_mzd_old + c_pal_old, 2)
-    c_tot_new = round(c_mzd_new + c_pal_new, 2)
-    sav       = round(c_tot_old - c_tot_new, 2)
+    c_dir_old=dir_cost(t_old,rate); c_oc_old=opp_cost(t_old,rate)
+    c_dir_new=dir_cost(t_new,rate); c_oc_new=opp_cost(t_new,rate)
+    c_mzd_old=round(c_dir_old+c_oc_old,2); c_mzd_new=round(c_dir_new+c_oc_new,2)
+    c_pal_old=round(n_pal_old*price_eur,2); c_pal_new=round(n_pal_new*price_eur,2)
+    c_tot_old=round(c_mzd_old+c_pal_old,2); c_tot_new=round(c_mzd_new+c_pal_new,2)
+    sav=round(c_tot_old-c_tot_new,2)
+    sav_pct=round(sav/c_tot_old*100,1) if c_tot_old>0 else 0
+    sav_mzd=round(c_mzd_old-c_mzd_new,2); sav_pal=round(c_pal_old-c_pal_new,2)
 
-    # Monthly
-    monthly = []
-    for month, grp in df.groupby('month'):
-        mk = grp[grp['preprava']=='KLT']; mp = grp[grp['preprava']=='Paleta']
-        og = grp.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index()
-        og['np'] = og['Objem [m3]'].apply(lambda v: math.ceil(v / PAL_M3_OLD))
-        kg_ = mk.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if len(mk) > 0 else pd.DataFrame({'Objem [m3]': []})
-        if len(kg_) > 0: kg_['nk'] = kg_['Objem [m3]'].apply(lambda v: math.ceil(v / KLT_M3))
-        pg_ = mp.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if len(mp) > 0 else pd.DataFrame({'Objem [m3]': []})
-        if len(pg_) > 0: pg_['np'] = pg_['Objem [m3]'].apply(lambda v: math.ceil(v / PAL_M3_NEW))
-        nk_  = int(kg_['nk'].sum()) if len(kg_) > 0 else 0
-        npo_ = int(pg_['np'].sum()) if len(pg_) > 0 else 0
-        npa_ = int(og['np'].sum())
-        tso  = len(grp)*216 + npa_*300
-        tsn  = len(mk)*20 + len(mk)*15 + nk_*15 + len(mp)*216 + npo_*300
-        cm_o = dir_cost(tso) + opp_cost(tso)
-        cm_n = dir_cost(tsn) + opp_cost(tsn)
-        cp_o = npa_ * PRICE_PAL_EUR; cp_n = npo_ * PRICE_PAL_EUR
-        ct_o = round(cm_o + cp_o, 2); ct_n = round(cm_n + cp_n, 2)
-        us   = round(ct_o - ct_n, 2)
-        monthly.append({'Mesiac': month, 'Záznamy': len(grp),
-            'KLT záznamy': len(mk), 'Paleta záznamy': len(mp),
-            'KLT ks': nk_, 'Palety starý': npa_, 'Palety nový': npo_,
-            'Nákl. starý (€)': ct_o, 'Nákl. nový (€)': ct_n, 'Úspora (€)': us,
-            'Úspora (Kč)': round(us * CZK, 2),
-            'Úspora proces (€)': round(cm_o - cm_n, 2),
-            'Úspora doprava (€)': round(cp_o - cp_n, 2)})
+    monthly=[]
+    for month,grp in df.groupby('month'):
+        mk=grp[grp['preprava']=='KLT']; mp=grp[grp['preprava']=='Paleta']
+        og_=grp.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index()
+        og_['np']=og_['Objem [m3]'].apply(lambda v:math.ceil(v/PAL_M3_OLD))
+        kg_=mk.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if len(mk)>0 else pd.DataFrame({'Objem [m3]':[]})
+        if len(kg_)>0: kg_['nk']=kg_['Objem [m3]'].apply(lambda v:math.ceil(v/KLT_M3))
+        pg_=mp.groupby(['Date','TargetBranch'])['Objem [m3]'].sum().reset_index() if len(mp)>0 else pd.DataFrame({'Objem [m3]':[]})
+        if len(pg_)>0: pg_['np']=pg_['Objem [m3]'].apply(lambda v:math.ceil(v/PAL_M3_NEW))
+        nk_=int(kg_['nk'].sum()) if len(kg_)>0 else 0
+        npo_=int(pg_['np'].sum()) if len(pg_)>0 else 0
+        npa_=int(og_['np'].sum())
+        tso=len(grp)*216+npa_*300; tsn=len(mk)*20+len(mk)*15+nk_*15+len(mp)*216+npo_*300
+        cm_o=dir_cost(tso,rate)+opp_cost(tso,rate); cm_n=dir_cost(tsn,rate)+opp_cost(tsn,rate)
+        cp_o=npa_*price_eur; cp_n=npo_*price_eur
+        ct_o=round(cm_o+cp_o,2); ct_n=round(cm_n+cp_n,2); us=round(ct_o-ct_n,2)
+        monthly.append({'Mesiac':month,'Záznamy':len(grp),'KLT záz.':len(mk),'Pal. záz.':len(mp),
+            'Palety starý':npa_,'Palety nový':npo_,
+            'Nákl. starý (€)':ct_o,'Nákl. nový (€)':ct_n,'Úspora (€)':us,'Úspora (Kč)':round(us*czk,2),
+            'Úspora proces (€)':round(cm_o-cm_n,2),'Úspora doprava (€)':round(cp_o-cp_n,2)})
 
-    return {
-        'n_total': n_total, 'n_klt': n_klt, 'n_pal': n_pal,
-        'n_klts': n_klts, 'n_pal_old': n_pal_old, 'n_pal_new': n_pal_new,
-        'c_mzd_old': round(c_mzd_old, 2), 'c_mzd_new': round(c_mzd_new, 2),
-        'c_pal_old': round(c_pal_old, 2), 'c_pal_new': round(c_pal_new, 2),
-        'c_tot_old': c_tot_old, 'c_tot_new': c_tot_new,
-        'sav': sav, 'sav_czk': round(sav * CZK, 2),
-        'sav_pct': round(sav / c_tot_old * 100, 1) if c_tot_old > 0 else 0,
-        'sav_mzd': round(c_mzd_old - c_mzd_new, 2),
-        'sav_pal': round(c_pal_old - c_pal_new, 2),
-        'monthly': pd.DataFrame(monthly),
-        'df': df,
-    }
+    return dict(n_total=n_total,n_klt=n_klt,n_pal=n_pal,n_klts=n_klts,
+                n_pal_old=n_pal_old,n_pal_new=n_pal_new,
+                c_dir_old=round(c_dir_old,2),c_oc_old=round(c_oc_old,2),
+                c_dir_new=round(c_dir_new,2),c_oc_new=round(c_oc_new,2),
+                c_mzd_old=c_mzd_old,c_mzd_new=c_mzd_new,
+                c_pal_old=c_pal_old,c_pal_new=c_pal_new,
+                c_tot_old=c_tot_old,c_tot_new=c_tot_new,
+                sav=sav,sav_czk=round(sav*czk,2),sav_pct=sav_pct,
+                sav_mzd=sav_mzd,sav_pal=sav_pal,
+                monthly=pd.DataFrame(monthly))
 
-def load_file(uploaded):
-    df = pd.read_excel(uploaded, header=None)
-    df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
-    filtered = df[(df['Geosize'] == 'SPO') & (df['Typ distribuce'] == 'DFR')].copy()
-    return filtered
-
-def metric_card(label, value, sub=None, color='blue'):
-    sub_html = f'<p style="font-size:11px;color:#888;margin:2px 0 0">{sub}</p>' if sub else ''
-    st.markdown(f"""
-    <div class="metric-card {color}">
-        <p class="metric-label">{label}</p>
-        <p class="metric-value">{value}</p>
-        {sub_html}
-    </div>""", unsafe_allow_html=True)
-
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Gaylord_container_KLT.jpg/320px-Gaylord_container_KLT.jpg", use_column_width=True)
-    st.markdown("## 📦 KLT Plánovanie prepravy")
-    st.markdown("---")
-
-    st.markdown("### ⚙️ Parametre")
-    thresh = st.slider("Prah KLT / Paleta (ks)", 1, 100, 20, 1,
-                        help="Záznamy s menej kusmi → KLT, ostatné → Paleta")
-    price_czk = st.number_input("Cena za paletu (Kč)", value=561.0, step=10.0, format="%.2f")
-    rate_eur  = st.number_input("Sadzba práce (€/hod)", value=15.0, step=0.5, format="%.2f")
-    czk_rate  = st.number_input("Kurz EUR/CZK", value=24.29, step=0.01, format="%.2f")
-
-    # Update globals if changed
-    PRICE_PAL_CZK = price_czk
-    PRICE_PAL_EUR = round(price_czk / czk_rate, 4)
-    RATE = rate_eur
-    CZK  = czk_rate
+    st.markdown("## ⚙️ Parametre")
+    thresh    = st.slider("Prah KLT / Paleta (ks)", 1, 100, 20)
+    price_czk = st.number_input("Cena za paletu (Kč)", value=561.0, step=10.0)
+    rate      = st.number_input("Sadzba práce (€/hod)", value=15.0, step=0.5)
+    czk       = st.number_input("Kurz EUR/CZK", value=24.29, step=0.01)
 
     st.markdown("---")
     st.markdown("### 📂 Nahrať súbor")
-    uploaded = st.file_uploader("Zošit2.xlsx (SPO+DFR dáta)", type=['xlsx'],
-                                  help="Súbor musí obsahovať stĺpce: Geosize, Typ distribuce, Počet ks, Objem [m3]")
+    uploaded = st.file_uploader("Zošit2.xlsx", type=['xlsx'])
+
     st.markdown("---")
-    st.markdown("**Filtre:** `Geosize = SPO` · `Typ distribuce = DFR`")
-    st.markdown(f"**Paleta:** {KLT_PER_PAL} KLT = {PAL_M3_NEW:.2f} m³")
-    st.markdown(f"**Starý fill:** 70 % → {PAL_M3_OLD:.3f} m³")
+    st.caption(f"Paleta: {KLT_PER_PAL} KLT = {PAL_M3_NEW:.2f} m³  \nStarý fill: 70 % → {PAL_M3_OLD:.3f} m³  \nFiltre: SPO + DFR")
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-st.markdown("# 📦 KLT Plánovanie prepravy — Analýza a optimalizácia")
-st.markdown(f"*Prah: **{thresh} ks** · Cena palety: **{price_czk:.0f} Kč** · Sadzba: **{rate_eur:.0f} €/hod** · Kurz: **{czk_rate} Kč/€***")
+# ── Load data ──────────────────────────────────────────────────────────────────
+df_raw = None
+if uploaded:
+    try:
+        df = pd.read_excel(uploaded, header=None)
+        df.columns = df.iloc[0]; df = df.iloc[1:].reset_index(drop=True)
+        df_raw = df[(df['Geosize']=='SPO') & (df['Typ distribuce']=='DFR')].copy()
+        if len(df_raw) == 0:
+            st.error("Súbor neobsahuje záznamy SPO + DFR.")
+            df_raw = None
+    except Exception as e:
+        st.error(f"Chyba: {e}"); df_raw = None
 
-if uploaded is None:
-    st.info("👈 Nahrajte súbor Zošit2.xlsx v ľavom paneli pre spustenie analýzy.")
+# ── Header ─────────────────────────────────────────────────────────────────────
+st.markdown("# 📦 KLT Plánovanie prepravy")
+
+if df_raw is None:
+    st.info("👈 Nahrajte súbor **Zošit2.xlsx** v ľavom paneli.")
     st.markdown("---")
-
-    # Show process comparison even without data
-    st.markdown('<p class="section-title">POROVNANIE PROCESOV</p>', unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("**🔴 Súčasný proces** — všetko na paletu")
-        steps_old = [
-            ("Naskladnenie + štítok", "20 s / záznam", ""),
-            ("Uloženie do regálu", "8 s / záznam", ""),
-            ("Zozbieranie z portov", "**180 s / záznam**", "⚠️ 83 % celkového času"),
-            ("Skenovanie + paleta", "8 s / záznam", ""),
-            ("Odvoz palety", "300 s / paletu", "fill 70 %"),
-        ]
-        for krok, cas, pozn in steps_old:
-            color = "#fdf0f0" if "Zozbieranie" in krok else "#f8f9fa"
-            border = "#E24B4A" if "Zozbieranie" in krok else "#ddd"
-            st.markdown(f"""<div style="background:{color};border-left:3px solid {border};
-                padding:6px 10px;margin:3px 0;border-radius:4px;font-size:13px">
-                <b>{krok}</b> — {cas} {f'<span style="color:#888;font-size:11px">{pozn}</span>' if pozn else ''}
-                </div>""", unsafe_allow_html=True)
-
-    with col2:
-        st.markdown("**🟢 Nový proces** — KLT + Paleta podľa prahu")
-        steps_new = [
-            ("Naskladnenie do AS", "20 s / záznam", "všetky záznamy", "#f0faf3", "#1E5631"),
-            (f"Rozhodnutie: < {thresh} ks?", "—", "po naskladnení", "#fffbe6", "#854F0B"),
-            ("KLT: Vypikovanie do BINu", "15 s / záznam", "+ 15 s / KLT sort", "#f0faf3", "#1E5631"),
-            ("KLT: Dopravník", "0 s odvoz", "✅ eliminovaný odvoz", "#f0faf3", "#1E5631"),
-            ("Paleta: súčasný proces", "216 s / záznam", "+ odvoz 300 s/pal", "#fdf7f0", "#854F0B"),
-        ]
-        for krok, cas, pozn, bg, bc in steps_new:
-            st.markdown(f"""<div style="background:{bg};border-left:3px solid {bc};
-                padding:6px 10px;margin:3px 0;border-radius:4px;font-size:13px">
-                <b>{krok}</b> — {cas} <span style="color:#888;font-size:11px">{pozn}</span>
-                </div>""", unsafe_allow_html=True)
+    st.markdown("**Čo uvidíte po nahraní súboru:**")
+    cols = st.columns(3)
+    for col, (icon, title, desc) in zip(cols, [
+        ("💰", "Celková úspora", "Veľká zelená karta s úsporou v € aj Kč — okamžite vidno koľko sa ušetrí"),
+        ("📊", "Rozpad nákladov", "Proces vs Doprava — kde presne úspora vzniká"),
+        ("📅", "Mesačný prehľad", "Tabuľka a grafy po mesiacoch + citlivosť prahu"),
+    ]):
+        col.markdown(f"### {icon} {title}\n{desc}")
     st.stop()
 
-# ── Load and compute ──────────────────────────────────────────────────────────
-try:
-    df_raw = load_file(uploaded)
-    if len(df_raw) == 0:
-        st.error("Súbor neobsahuje záznamy s Geosize=SPO a Typ distribuce=DFR.")
-        st.stop()
-    res = compute_all(df_raw, thresh)
-except Exception as e:
-    st.error(f"Chyba pri načítaní súboru: {e}")
-    st.stop()
+# ── Compute ────────────────────────────────────────────────────────────────────
+r = compute(df_raw, thresh, rate, czk, price_czk)
+mdf = r['monthly']
 
-# ── KPI row ───────────────────────────────────────────────────────────────────
-st.markdown('<p class="section-title">KĽÚČOVÉ UKAZOVATELE</p>', unsafe_allow_html=True)
-c1,c2,c3,c4,c5,c6 = st.columns(6)
-with c1: metric_card("Záznamy celkom", f"{res['n_total']:,}", f"KLT: {res['n_klt']} · Pal: {res['n_pal']}")
-with c2: metric_card("KLT ks", f"{res['n_klts']:,}", f"{res['n_klt']} záz. → dopravník", "blue")
-with c3: metric_card("Palety (nový)", f"{res['n_pal_new']:,}", f"vs {res['n_pal_old']} starý (−{res['n_pal_old']-res['n_pal_new']})", "amber")
-with c4: metric_card("Celkové náklady starý", f"{res['c_tot_old']:,.0f} €", f"{res['c_tot_old']*CZK:,.0f} Kč", "red")
-with c5: metric_card("Celkové náklady nový", f"{res['c_tot_new']:,.0f} €", f"{res['c_tot_new']*CZK:,.0f} Kč", "blue")
-with c6: metric_card("ÚSPORA", f"{res['sav']:,.0f} € ({res['sav_pct']}%)", f"{res['sav_czk']:,.0f} Kč", "green")
+# ══════════════════════════════════════════════════════════════════════════════
+# HERO: ÚSPORA — veľká zelená karta
+# ══════════════════════════════════════════════════════════════════════════════
+col_hero, col_costs = st.columns([1.4, 1])
 
-# ── Cost breakdown ─────────────────────────────────────────────────────────────
-st.markdown('<p class="section-title">ROZPAD NÁKLADOV A ÚSPOR</p>', unsafe_allow_html=True)
-col_b, col_c = st.columns([2, 1])
+with col_hero:
+    st.markdown(f"""
+    <div class="savings-hero">
+        <p class="sh-label">CELKOVÁ ÚSPORA  ·  celé obdobie  ·  {r['n_total']:,} záznamov</p>
+        <p class="sh-amount">{r['sav']:,.0f} €</p>
+        <p class="sh-sub">{r['sav_czk']:,.0f} Kč</p>
+        <span class="sh-pct">−{r['sav_pct']} %</span>
+        &nbsp;&nbsp;
+        <span style="font-size:15px;opacity:0.75">oproti súčasnému procesu</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-with col_b:
-    breakdown_data = {
-        'Zložka': ['Proces — priame mzdové', 'Proces — opportunity cost', 'PROCES SPOLU', 'DOPRAVA — palety', 'CELKOVÉ NÁKLADY'],
-        'Starý (€)': [round(res['c_mzd_old'] * (dir_cost(1) / (dir_cost(1) + opp_cost(1))), 2) if (dir_cost(1)+opp_cost(1))>0 else 0,
-                      round(res['c_mzd_old'] * (opp_cost(1) / (dir_cost(1) + opp_cost(1))), 2) if (dir_cost(1)+opp_cost(1))>0 else 0,
-                      res['c_mzd_old'], res['c_pal_old'], res['c_tot_old']],
-        'Nový (€)':  [0, 0, res['c_mzd_new'], res['c_pal_new'], res['c_tot_new']],
-        'Úspora (€)': [0, 0, res['sav_mzd'], res['sav_pal'], res['sav']],
-        'Úspora (Kč)': [0, 0, round(res['sav_mzd']*CZK,2), round(res['sav_pal']*CZK,2), res['sav_czk']],
-        '% z úspory': [0, 0, round(res['sav_mzd']/res['sav']*100,1) if res['sav']>0 else 0,
-                       round(res['sav_pal']/res['sav']*100,1) if res['sav']>0 else 0, 100.0],
-    }
-    # Compute priame/OC properly
-    t_old_total = res['n_total']*216 + res['n_pal_old']*300
-    t_new_total = (res['n_klt']*20 + res['n_klt']*15 + res['n_klts']*15 +
-                   res['n_pal']*216 + res['n_pal_new']*300)
-    c_dir_old = dir_cost(t_old_total); c_oc_old = opp_cost(t_old_total)
-    c_dir_new = dir_cost(t_new_total); c_oc_new = opp_cost(t_new_total)
-    breakdown_data['Starý (€)'][0] = round(c_dir_old, 2)
-    breakdown_data['Starý (€)'][1] = round(c_oc_old, 2)
-    breakdown_data['Nový (€)'][0]  = round(c_dir_new, 2)
-    breakdown_data['Nový (€)'][1]  = round(c_oc_new, 2)
-    breakdown_data['Úspora (€)'][0] = round(c_dir_old - c_dir_new, 2)
-    breakdown_data['Úspora (€)'][1] = round(c_oc_old - c_oc_new, 2)
-    breakdown_data['Úspora (Kč)'][0] = round((c_dir_old-c_dir_new)*CZK, 2)
-    breakdown_data['Úspora (Kč)'][1] = round((c_oc_old-c_oc_new)*CZK, 2)
-    breakdown_data['% z úspory'][0]  = round((c_dir_old-c_dir_new)/res['sav']*100,1) if res['sav']>0 else 0
-    breakdown_data['% z úspory'][1]  = round((c_oc_old-c_oc_new)/res['sav']*100,1) if res['sav']>0 else 0
+    # Breakdown bars under the hero
+    pct_proc = round(r['sav_mzd']/r['sav']*100,1) if r['sav']>0 else 0
+    pct_dop  = round(r['sav_pal']/r['sav']*100,1) if r['sav']>0 else 0
 
-    bdf = pd.DataFrame(breakdown_data)
-
-    def style_breakdown(df):
-        styles = []
-        for i, row in df.iterrows():
-            if 'CELKOVÉ' in str(row['Zložka']):
-                styles.append(['background-color:#1F3864;color:white;font-weight:bold']*len(row))
-            elif 'SPOLU' in str(row['Zložka']) or 'DOPRAVA' in str(row['Zložka']):
-                styles.append(['background-color:#EBF3FB;font-weight:bold']*len(row))
-            else:
-                styles.append(['']*len(row))
-        return pd.DataFrame(styles, index=df.index, columns=df.columns)
-
-    st.dataframe(
-        bdf.style
-            .apply(style_breakdown, axis=None)
-            .format({'Starý (€)': '{:,.2f} €', 'Nový (€)': '{:,.2f} €',
-                     'Úspora (€)': '{:,.2f} €', 'Úspora (Kč)': '{:,.0f} Kč',
-                     '% z úspory': '{:.1f} %'}),
-        use_container_width=True, hide_index=True
-    )
-
-with col_c:
-    st.markdown("**Podiel na celkovej úspore**")
-    import json as _json
-    pct_proc = round(res['sav_mzd']/res['sav']*100,1) if res['sav']>0 else 0
-    pct_dop  = round(res['sav_pal']/res['sav']*100,1) if res['sav']>0 else 0
-    for label, pct, color, eur_val in [
-        ('Proces (mzdové)', pct_proc, '#2E75B6', res['sav_mzd']),
-        ('Doprava (palety)', pct_dop, '#E67E22', res['sav_pal']),
+    for label, pct, color, eur_val, czk_val in [
+        ("Proces (mzdové náklady)", pct_proc, "#2E75B6", r['sav_mzd'], round(r['sav_mzd']*czk,0)),
+        ("Doprava (náklady na palety)", pct_dop, "#E67E22", r['sav_pal'], round(r['sav_pal']*czk,0)),
     ]:
         st.markdown(f"""
-        <div style="margin:8px 0">
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
-                <span>{label}</span><span style="font-weight:600">{pct}%  ·  {eur_val:,.0f} €</span>
+        <div class="breakdown-row">
+            <div class="breakdown-label">
+                <span>{label}</span>
+                <span style="font-weight:600">{eur_val:,.0f} €  ·  {czk_val:,.0f} Kč  ·  {pct}%</span>
             </div>
-            <div style="background:#eee;border-radius:4px;height:18px">
-                <div style="background:{color};width:{pct}%;height:18px;border-radius:4px"></div>
+            <div class="bar-track">
+                <div class="bar-fill" style="width:{pct}%;background:{color}">{pct}%</div>
             </div>
-        </div>""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-# ── Monthly table ──────────────────────────────────────────────────────────────
-st.markdown('<p class="section-title">MESAČNÝ ROZPAD</p>', unsafe_allow_html=True)
-mdf = res['monthly'].copy()
-if len(mdf) > 0:
-    mdf_display = mdf[['Mesiac','Záznamy','KLT záznamy','Paleta záznamy',
-                        'Úspora proces (€)','Úspora doprava (€)','Úspora (€)','Úspora (Kč)',
-                        'Nákl. starý (€)','Nákl. nový (€)']].copy()
+with col_costs:
+    st.markdown(f"""
+    <div class="cost-box old">
+        <p class="clabel">🔴 Súčasný proces</p>
+        <p class="cval">{r['c_tot_old']:,.0f} €</p>
+        <p class="csub">{r['c_tot_old']*czk:,.0f} Kč</p>
+        <hr style="border-color:#F09595;margin:10px 0">
+        <p class="cdetail">Mzdové: {r['c_mzd_old']:,.0f} €</p>
+        <p class="cdetail">Palety ({r['n_pal_old']} ks): {r['c_pal_old']:,.0f} €</p>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="cost-box new">
+        <p class="clabel">🟢 Nový proces  (prah {thresh} ks)</p>
+        <p class="cval">{r['c_tot_new']:,.0f} €</p>
+        <p class="csub">{r['c_tot_new']*czk:,.0f} Kč</p>
+        <hr style="border-color:#5DCAA5;margin:10px 0">
+        <p class="cdetail">Mzdové: {r['c_mzd_new']:,.0f} €</p>
+        <p class="cdetail">Palety ({r['n_pal_new']} ks): {r['c_pal_new']:,.0f} €</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    def highlight_partial(row):
-        if row['Mesiac'] in ('2025-09','2026-05'):
-            return ['background-color:#FFF9E6']*len(row)
+# ── Mini KPIs ──────────────────────────────────────────────────────────────────
+st.markdown('<p class="section-title">PREHĽAD OBJEMOV</p>', unsafe_allow_html=True)
+k1,k2,k3,k4,k5,k6,k7 = st.columns(7)
+for col, label, val, sub in [
+    (k1, "Záznamy celkom", f"{r['n_total']:,}", "SPO + DFR"),
+    (k2, "KLT záznamy", f"{r['n_klt']:,}", f"{round(r['n_klt']/r['n_total']*100,1)}% z celku"),
+    (k3, "KLT ks", f"{r['n_klts']:,}", "→ dopravník"),
+    (k4, "Paleta záznamy", f"{r['n_pal']:,}", f"{round(r['n_pal']/r['n_total']*100,1)}% z celku"),
+    (k5, "Palety starý", f"{r['n_pal_old']:,}", "fill 70%"),
+    (k6, "Palety nový", f"{r['n_pal_new']:,}", f"−{r['n_pal_old']-r['n_pal_new']} paliet"),
+    (k7, "Úspora / záznam", f"{round(r['sav']/r['n_total'],2):.2f} €", f"{round(r['sav']/r['n_total']*czk,1):.1f} Kč"),
+]:
+    col.markdown(f"""<div class="mini-kpi"><p class="ml">{label}</p><p class="mv">{val}</p>
+    <p class="ms">{sub}</p></div>""", unsafe_allow_html=True)
+
+# ── Monthly ────────────────────────────────────────────────────────────────────
+st.markdown('<p class="section-title">MESAČNÝ PREHĽAD</p>', unsafe_allow_html=True)
+
+tab1, tab2 = st.tabs(["📊 Grafy", "📋 Tabuľka"])
+
+with tab1:
+    col_g1, col_g2 = st.columns(2)
+    with col_g1:
+        st.markdown("**Mesačná úspora — Proces vs Doprava (€)**")
+        chart_sav = mdf[['Mesiac','Úspora proces (€)','Úspora doprava (€)']].set_index('Mesiac')
+        st.bar_chart(chart_sav, color=['#2E75B6','#E67E22'], height=280)
+    with col_g2:
+        st.markdown("**Mesačné celkové náklady: starý vs nový (€)**")
+        chart_costs = mdf[['Mesiac','Nákl. starý (€)','Nákl. nový (€)']].set_index('Mesiac')
+        st.bar_chart(chart_costs, color=['#C0392B','#1E5631'], height=280)
+
+with tab2:
+    disp = mdf[['Mesiac','Záznamy','KLT záz.','Pal. záz.','Palety starý','Palety nový',
+                'Nákl. starý (€)','Nákl. nový (€)','Úspora (€)','Úspora (Kč)']].copy()
+    def hl(row):
+        if row['Mesiac'] in('2025-09','2026-05'):
+            return ['background-color:#fffbe6']*len(row)
         return ['']*len(row)
-
     st.dataframe(
-        mdf_display.style
-            .apply(highlight_partial, axis=1)
-            .format({'Úspora proces (€)': '{:,.2f} €', 'Úspora doprava (€)': '{:,.2f} €',
-                     'Úspora (€)': '{:,.2f} €', 'Úspora (Kč)': '{:,.0f} Kč',
-                     'Nákl. starý (€)': '{:,.2f} €', 'Nákl. nový (€)': '{:,.2f} €'})
+        disp.style.apply(hl, axis=1)
+            .format({'Nákl. starý (€)':'{:,.2f} €','Nákl. nový (€)':'{:,.2f} €',
+                     'Úspora (€)':'{:,.2f} €','Úspora (Kč)':'{:,.0f} Kč'})
             .highlight_max(subset=['Úspora (€)'], color='#d4edda')
             .highlight_min(subset=['Úspora (€)'], color='#f8d7da'),
         use_container_width=True, hide_index=True
     )
 
-    # Charts
-    col_ch1, col_ch2 = st.columns(2)
-    with col_ch1:
-        st.markdown("**Mesačná úspora: proces vs doprava**")
-        chart_data = mdf[['Mesiac','Úspora proces (€)','Úspora doprava (€)']].set_index('Mesiac')
-        st.bar_chart(chart_data, color=['#2E75B6','#E67E22'])
+# ── Sensitivity ────────────────────────────────────────────────────────────────
+st.markdown('<p class="section-title">CITLIVOSŤ PRAHU</p>', unsafe_allow_html=True)
+with st.expander(f"Zobraziť porovnanie prahov (aktuálny: {thresh} ks)", expanded=False):
+    rows=[]
+    for t_val in [5,10,15,20,25,30,40,50,75,100]:
+        rv = compute(df_raw, t_val, rate, czk, price_czk)
+        rows.append({'Prah (ks)':t_val,'KLT záz.':rv['n_klt'],
+            'KLT záz. (%)':f"{rv['n_klt']/rv['n_total']*100:.1f}%",
+            'KLT ks':rv['n_klts'],'Palety nový':rv['n_pal_new'],
+            'Nákl. nový (€)':rv['c_tot_new'],'Úspora (€)':rv['sav'],
+            'Úspora (Kč)':rv['sav_czk'],'Úspora (%)':f"{rv['sav_pct']}%"})
+    sdf=pd.DataFrame(rows)
+    def hl_curr(row):
+        return ['background-color:#DDEEFF;font-weight:bold']*len(row) if row['Prah (ks)']==thresh else ['']*len(row)
+    st.dataframe(
+        sdf.style.apply(hl_curr,axis=1)
+            .format({'Nákl. nový (€)':'{:,.2f} €','Úspora (€)':'{:,.2f} €',
+                     'Úspora (Kč)':'{:,.0f} Kč','KLT ks':'{:,}'}),
+        use_container_width=True, hide_index=True
+    )
 
-    with col_ch2:
-        st.markdown("**Mesačné celkové náklady**")
-        chart_data2 = mdf[['Mesiac','Nákl. starý (€)','Nákl. nový (€)']].set_index('Mesiac')
-        st.bar_chart(chart_data2, color=['#C0392B','#1E5631'])
-
-# ── Sensitivity ───────────────────────────────────────────────────────────────
-st.markdown('<p class="section-title">CITLIVOSŤ PRAHU  (aktuálny prah: ' + str(thresh) + ' ks)</p>', unsafe_allow_html=True)
-snap_thresholds = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100]
-snap_rows = []
-for t_val in snap_thresholds:
-    r = compute_all(df_raw, t_val)
-    snap_rows.append({
-        'Prah (ks)': t_val,
-        'KLT záz.': r['n_klt'],
-        'KLT záz. (%)': f"{r['n_klt']/r['n_total']*100:.1f}%",
-        'KLT ks': r['n_klts'],
-        'Palety nový': r['n_pal_new'],
-        'Nákl. nový (€)': r['c_tot_new'],
-        'Úspora (€)': r['sav'],
-        'Úspora (%)': f"{r['sav_pct']}%",
-    })
-snap_df = pd.DataFrame(snap_rows)
-
-def highlight_current(row):
-    if row['Prah (ks)'] == thresh:
-        return ['background-color:#DDEEFF;font-weight:bold']*len(row)
-    return ['']*len(row)
-
-st.dataframe(
-    snap_df.style
-        .apply(highlight_current, axis=1)
-        .format({'Nákl. nový (€)': '{:,.2f} €', 'Úspora (€)': '{:,.2f} €', 'KLT ks': '{:,}'}),
-    use_container_width=True, hide_index=True
-)
-
-# ── Download ───────────────────────────────────────────────────────────────────
+# ── Export ─────────────────────────────────────────────────────────────────────
 st.markdown('<p class="section-title">EXPORT</p>', unsafe_allow_html=True)
-col_d1, col_d2 = st.columns(2)
+c1, c2 = st.columns(2)
+c1.download_button("⬇️ Mesačný rozpad (CSV)", mdf.to_csv(index=False).encode('utf-8-sig'),
+    f"KLT_mesacny_rozpad_prah{thresh}ks.csv", "text/csv", use_container_width=True)
+c2.download_button("⬇️ Citlivosť prahu (CSV)", sdf.to_csv(index=False).encode('utf-8-sig') if 'sdf' in dir() else b'',
+    "KLT_citlivost.csv", "text/csv", use_container_width=True)
 
-with col_d1:
-    # CSV export of monthly breakdown
-    csv = mdf.to_csv(index=False).encode('utf-8-sig')
-    st.download_button(
-        "⬇️  Stiahnuť mesačný rozpad (CSV)",
-        data=csv,
-        file_name=f"KLT_mesacny_rozpad_prah{thresh}ks.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
-
-with col_d2:
-    # CSV export of sensitivity
-    csv2 = snap_df.to_csv(index=False).encode('utf-8-sig')
-    st.download_button(
-        "⬇️  Stiahnuť citlivosť prahu (CSV)",
-        data=csv2,
-        file_name=f"KLT_citlivost_prahu.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
-
-# ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
-st.markdown(f"""
-<div style="font-size:11px;color:#888;text-align:center">
-KLT Plánovanie prepravy  ·  Filtre: Geosize=SPO · DFR  ·
-Paleta: {KLT_PER_PAL} KLT = {PAL_M3_NEW:.2f}m³ (starý fill 70% = {PAL_M3_OLD:.3f}m³)  ·
-Výkon: {VYKON_STD}→{VYKON_DIST} JBL/hod  ·
-Kurz: {CZK} Kč/€  ·  {datetime.now().strftime('%d.%m.%Y')}
-</div>
-""", unsafe_allow_html=True)
+st.caption(f"KLT Plánovanie prepravy · SPO+DFR · Paleta: 24 KLT={PAL_M3_NEW:.2f}m³ · Starý fill 70% · {czk} Kč/€ · {datetime.now().strftime('%d.%m.%Y')}")
