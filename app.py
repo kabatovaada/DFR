@@ -475,20 +475,36 @@ with tab1:
         st.bar_chart(chart_costs, color=['#C0392B','#1E5631'], height=280)
 
 with tab2:
-    disp = mdf[['Mesiac','Záznamy','KLT záz.','Pal. záz.','Palety starý','Palety nový',
-                'Nákl. starý (€)','Nákl. nový (€)','Úspora (€)','Úspora (Kč)']].copy()
-    def hl(row):
-        if row['Mesiac'] in('2025-09','2026-05'):
-            return ['background-color:#fffbe6']*len(row)
-        return ['']*len(row)
-    st.dataframe(
-        disp.style.apply(hl, axis=1)
-            .format({'Nákl. starý (€)':'{:,.2f} €','Nákl. nový (€)':'{:,.2f} €',
-                     'Úspora (€)':'{:,.2f} €','Úspora (Kč)':'{:,.0f} Kč'})
-            .highlight_max(subset=['Úspora (€)'], color='#d4edda')
-            .highlight_min(subset=['Úspora (€)'], color='#f8d7da'),
-        use_container_width=True, hide_index=True
-    )
+    cols_show = ['Mesiac','Záznamy','KLT záz.','Pal. záz.','Palety starý','Palety nový',
+                 'Nákl. starý (€)','Nákl. nový (€)','Úspora (€)','Úspora (Kč)']
+    disp = mdf[cols_show].copy()
+    max_sav = disp['Úspora (€)'].max()
+    min_sav = disp['Úspora (€)'].min()
+
+    header = "".join(f'<th style="padding:7px 10px;background:#2d3748;color:#fff;font-size:12px;font-weight:600;white-space:nowrap">{c}</th>' for c in cols_show)
+    rows_html = ""
+    for _, row in disp.iterrows():
+        is_partial = row['Mesiac'] in ('2025-09','2026-05')
+        bg = "#fffbe6" if is_partial else ("#f0fff4" if row['Úspora (€)'] == max_sav else ("#fff5f5" if row['Úspora (€)'] == min_sav else "#ffffff"))
+        def fmt(col, val):
+            if col in ('Nákl. starý (€)','Nákl. nový (€)','Úspora (€)'): return f"{val:,.2f} €"
+            if col == 'Úspora (Kč)': return f"{val:,.0f} Kč"
+            return str(val)
+        cells = ""
+        for col in cols_show:
+            fc = "#276749" if col == 'Úspora (€)' and not is_partial else ("#9b2c2c" if col == 'Nákl. starý (€)' else "#2d3748")
+            fw = "700" if col in ('Úspora (€)','Úspora (Kč)') else "400"
+            cells += f'<td style="padding:6px 10px;color:{fc};font-weight:{fw};font-size:12px;border-bottom:1px solid #e2e8f0">{fmt(col, row[col])}</td>'
+        rows_html += f'<tr style="background:{bg}">{cells}</tr>'
+
+    st.markdown(f"""
+    <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0">
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>{header}</tr></thead>
+      <tbody>{rows_html}</tbody>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── Sensitivity ────────────────────────────────────────────────────────────────
 st.markdown('<p class="section-title">CITLIVOSŤ PRAHU</p>', unsafe_allow_html=True)
@@ -504,12 +520,31 @@ with st.expander(f"Zobraziť porovnanie prahov (aktuálny: {thresh} ks)", expand
     sdf=pd.DataFrame(rows)
     def hl_curr(row):
         return ['background-color:#DDEEFF;font-weight:bold']*len(row) if row['Prah (ks)']==thresh else ['']*len(row)
-    st.dataframe(
-        sdf.style.apply(hl_curr,axis=1)
-            .format({'Nákl. nový (€)':'{:,.2f} €','Úspora (€)':'{:,.2f} €',
-                     'Úspora (Kč)':'{:,.0f} Kč','KLT ks':'{:,}'}),
-        use_container_width=True, hide_index=True
-    )
+    s_cols = list(sdf.columns)
+    s_header = "".join(f'<th style="padding:7px 10px;background:#2d3748;color:#fff;font-size:12px;font-weight:600;white-space:nowrap">{c}</th>' for c in s_cols)
+    s_rows = ""
+    for _, row in sdf.iterrows():
+        is_curr = row['Prah (ks)'] == thresh
+        bg = "#dbeafe" if is_curr else ("#f7fafc" if int(row['Prah (ks)']) % 2 == 0 else "#ffffff")
+        fw_row = "700" if is_curr else "400"
+        cells = ""
+        for col in s_cols:
+            val = row[col]
+            if col == 'Nákl. nový (€)': val = f"{val:,.2f} €"
+            elif col == 'Úspora (€)': val = f"{val:,.2f} €"
+            elif col == 'Úspora (Kč)': val = f"{val:,.0f} Kč"
+            elif col == 'KLT ks': val = f"{val:,}"
+            fc = "#1e40af" if is_curr else ("#276749" if col in ('Úspora (€)','Úspora (Kč)','Úspora (%)') else "#2d3748")
+            cells += f'<td style="padding:6px 10px;color:{fc};font-weight:{fw_row};font-size:12px;border-bottom:1px solid #e2e8f0">{val}</td>'
+        s_rows += f'<tr style="background:{bg}">{cells}</tr>'
+    st.markdown(f"""
+    <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0">
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>{s_header}</tr></thead>
+      <tbody>{s_rows}</tbody>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── Export ─────────────────────────────────────────────────────────────────────
 st.markdown('<p class="section-title">EXPORT</p>', unsafe_allow_html=True)
