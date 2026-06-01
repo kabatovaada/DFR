@@ -362,9 +362,15 @@ with col_proc:
           <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klts']:,}×15s</td>
           <td style="padding:3px 0;text-align:right;color:#888">—</td>
         </tr>
+        <tr style="background:#fff8f0">
+          <td style="padding:3px 0;color:#744210;font-weight:600">Odvoz palety</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">{r['n_pal_old']:,}×300s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">{r['n_pal_new']:,}×300s</td>
+        </tr>
         <tr style="border-top:1px solid #fed7d7">
           <td style="padding:3px 0;color:#333">Čas/záz. (ops)</td>
-          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">223 s</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">223s + odvoz</td>
           <td style="padding:3px 0;text-align:right;color:#2b4c7e;font-weight:600">43s + sort</td>
           <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">223s + odvoz</td>
         </tr>
