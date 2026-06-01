@@ -321,64 +321,72 @@ with col_proc:
 
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <tr style="border-bottom:1px solid #fed7d7">
-          <td style="padding:4px 0;color:#555">Krok</td>
-          <td style="padding:4px 0;text-align:right;color:#555">Starý</td>
-          <td style="padding:4px 0;text-align:right;color:#555">Nový</td>
+          <td style="padding:4px 0;color:#555;font-weight:600">Krok</td>
+          <td style="padding:4px 0;text-align:right;color:#9b2c2c;font-weight:600">Starý<br><span style="font-size:10px;font-weight:400">({r['n_total']:,} záz.)</span></td>
+          <td style="padding:4px 0;text-align:right;color:#2b4c7e;font-weight:600">Nový KLT<br><span style="font-size:10px;font-weight:400">({r['n_klt']:,} záz.)</span></td>
+          <td style="padding:4px 0;text-align:right;color:#744210;font-weight:600">Nový Paleta<br><span style="font-size:10px;font-weight:400">({r['n_pal']:,} záz.)</span></td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Naskladnenie</td>
-          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×20s</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_total']}×20s</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['n_total']:,}×20s</td>
+          <td style="padding:3px 0;text-align:right;color:#2b4c7e">{r['n_klt']:,}×20s</td>
+          <td style="padding:3px 0;text-align:right;color:#744210">{r['n_pal']:,}×20s</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Uloženie do regálu</td>
-          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×15s</td>
-          <td style="padding:3px 0;text-align:right;color:#888">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['n_total']:,}×15s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210">{r['n_pal']:,}×15s</td>
         </tr>
         <tr style="background:#fff0f0">
           <td style="padding:3px 0;color:#9b2c2c;font-weight:600">Zozbieranie ⚠️</td>
-          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_total']}×180s</td>
-          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{r['n_total']:,}×180s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">{r['n_pal']:,}×180s</td>
         </tr>
         <tr>
-          <td style="padding:3px 0;color:#276749;font-weight:600">Pikovanie do BINu</td>
-          <td style="padding:3px 0;text-align:right;color:#888">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_klt']}×8s</td>
+          <td style="padding:3px 0;color:#276749;font-weight:600">Pikovanie do BINu ✓</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{r['n_klt']:,}×8s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Skenovanie</td>
-          <td style="padding:3px 0;text-align:right;color:#333">{r['n_total']}×8s</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">—&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['n_total']:,}×8s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#744210">{r['n_pal']:,}×8s</td>
         </tr>
         <tr>
-          <td style="padding:3px 0;color:#333">Sort (15s/KLT)</td>
-          <td style="padding:3px 0;text-align:right;color:#333">—</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klts']}×15s</td>
+          <td style="padding:3px 0;color:#276749">Sort nakládka (15s/KLT) ✓</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+          <td style="padding:3px 0;text-align:right;color:#276749">{r['n_klts']:,}×15s</td>
+          <td style="padding:3px 0;text-align:right;color:#888">—</td>
+        </tr>
+        <tr style="border-top:1px solid #fed7d7">
+          <td style="padding:3px 0;color:#333">Čas/záz. (ops)</td>
+          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">223 s</td>
+          <td style="padding:3px 0;text-align:right;color:#2b4c7e;font-weight:600">43s + sort</td>
+          <td style="padding:3px 0;text-align:right;color:#744210;font-weight:600">223s + odvoz</td>
         </tr>
         <tr style="border-top:1.5px solid #feb2b2">
-          <td style="padding:5px 0;color:#333;font-weight:600">Čas/záz. (operácie)</td>
-          <td style="padding:5px 0;text-align:right;color:#9b2c2c;font-weight:600">223 s (3,7 min)</td>
-          <td style="padding:5px 0;text-align:right;color:#276749;font-weight:600">43s + 15s/KLT sort</td>
-        </tr>
-        <tr>
-          <td style="padding:3px 0;color:#333">Čas celkom</td>
-          <td style="padding:3px 0;text-align:right;color:#9b2c2c;font-weight:600">{t_old_h:.1f} hod</td>
-          <td style="padding:3px 0;text-align:right;color:#276749;font-weight:600">{t_new_h:.1f} hod</td>
+          <td style="padding:5px 0;color:#333;font-weight:600">Čas celkom</td>
+          <td style="padding:5px 0;text-align:right;color:#9b2c2c;font-weight:600">{t_old_h:.1f} hod</td>
+          <td colspan="2" style="padding:5px 0;text-align:right;color:#276749;font-weight:600">{t_new_h:.1f} hod (KLT+Pal)</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Priame ({rate:.0f} €/hod)</td>
           <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['c_dir_old']:,.0f} €</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">{r['c_dir_new']:,.0f} €</td>
+          <td colspan="2" style="padding:3px 0;text-align:right;color:#276749">{r['c_dir_new']:,.0f} €</td>
         </tr>
         <tr>
           <td style="padding:3px 0;color:#333">Opportunity cost</td>
           <td style="padding:3px 0;text-align:right;color:#9b2c2c">{r['c_oc_old']:,.0f} €</td>
-          <td style="padding:3px 0;text-align:right;color:#276749">{r['c_oc_new']:,.0f} €</td>
+          <td colspan="2" style="padding:3px 0;text-align:right;color:#276749">{r['c_oc_new']:,.0f} €</td>
         </tr>
         <tr style="border-top:1.5px solid #feb2b2">
           <td style="padding:5px 0;font-weight:700;color:#333">Proces spolu</td>
           <td style="padding:5px 0;text-align:right;font-weight:700;color:#9b2c2c">{r['c_mzd_old']:,.0f} €</td>
-          <td style="padding:5px 0;text-align:right;font-weight:700;color:#276749">{r['c_mzd_new']:,.0f} €</td>
+          <td colspan="2" style="padding:5px 0;text-align:right;font-weight:700;color:#276749">{r['c_mzd_new']:,.0f} €</td>
         </tr>
       </table>
       <div style="background:#9b2c2c;border-radius:6px;padding:6px 10px;margin-top:10px;text-align:center">
