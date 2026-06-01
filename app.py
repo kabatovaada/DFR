@@ -127,10 +127,11 @@ def compute(df_raw, thresh, rate, czk, price_czk):
         cm_o=dir_cost(tso,rate)+opp_cost(tso,rate); cm_n=dir_cost(tsn,rate)+opp_cost(tsn,rate)
         cp_o=npa_*price_eur; cp_n=npo_*price_eur
         ct_o=round(cm_o+cp_o,2); ct_n=round(cm_n+cp_n,2); us=round(ct_o-ct_n,2)
-        monthly.append({'Mesiac':month,'Záznamy':len(grp),'KLT záz.':len(mk),'Pal. záz.':len(mp),
+        monthly.append({'Mesiac':month,'Záznamy':len(grp),'KLT záz.':len(mk),'KLT ks':nk_,'Pal. záz.':len(mp),
             'Palety starý':npa_,'Palety nový':npo_,
             'Nákl. starý (€)':ct_o,'Nákl. nový (€)':ct_n,'Úspora (€)':us,'Úspora (Kč)':round(us*czk,2),
-            'Úspora proces (€)':round(cm_o-cm_n,2),'Úspora doprava (€)':round(cp_o-cp_n,2)})
+            'Úspora proces (€)':round(cm_o-cm_n,2),'Úspora doprava (€)':round(cp_o-cp_n,2),
+            'Pal. nákl. starý (€)':round(cp_o,2),'Pal. nákl. nový (€)':round(cp_n,2)})
 
     return dict(n_total=n_total,n_klt=n_klt,n_pal=n_pal,n_klts=n_klts,
                 n_pal_old=n_pal_old,n_pal_new=n_pal_new,
@@ -163,7 +164,6 @@ import os
 BASE = os.path.dirname(__file__)
 
 DATA_SOURCES = [
-    {"file": "Zošit2.xlsx",                    "header": None, "label": "Zošit2 (hist.)"},
     {"file": "DFR_Q1_2026_CZLC4-SKLC3.xlsx",  "header": 2,    "label": "CZLC4→SKLC3 Q1 2026"},
     {"file": "DFR_Q1_2026_SKLC3-CZLC4.xlsx",  "header": 2,    "label": "SKLC3→CZLC4 Q1 2026"},
 ]
