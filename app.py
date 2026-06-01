@@ -4,7 +4,7 @@ import math
 from datetime import datetime
 
 st.set_page_config(
-    page_title="KLT Plánovanie prepravy",
+    page_title="Spracovanie DFR cez AS",
     page_icon="📦",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -195,7 +195,7 @@ for src in DATA_SOURCES:
 df_raw = pd.concat(frames, ignore_index=True) if frames else None
 
 # ── Header ─────────────────────────────────────────────────────────────────────
-st.markdown("# 📦 KLT Plánovanie prepravy")
+st.markdown("# 📦 Spracovanie DFR cez AS")
 
 # Source info bar
 if frames:
@@ -692,4 +692,4 @@ c2.download_button("⬇️ Citlivosť prahu (CSV)", sdf.to_csv(index=False).enco
     "KLT_citlivost.csv", "text/csv", use_container_width=True)
 
 st.markdown("---")
-st.caption(f"KLT Plánovanie prepravy · SPO+DFR · Paleta: 24 KLT={PAL_M3_NEW:.2f}m³ · Starý fill 70% · {czk} Kč/€ · {datetime.now().strftime('%d.%m.%Y')}")
+st.caption(f"Spracovanie DFR cez AS · SPO+DFR · Paleta: 24 KLT={PAL_M3_NEW:.2f}m³ · Starý fill 70% · {czk} Kč/€ · {datetime.now().strftime('%d.%m.%Y')}")
