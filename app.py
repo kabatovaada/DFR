@@ -300,31 +300,25 @@ with tab_d1:
     <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
     <rect x="40" y="12" width="600" height="36" rx="8" fill="#9B2C2C"/>
     <text x="340" y="30" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#FFFFFF">Súčasný proces — 5 krokov  ·  223 s / záz. + odvoz</text>
-    <!-- Step 1 -->
     <rect x="200" y="72" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
     <text x="340" y="92" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">1. Naskladnenie + štítok</text>
     <text x="340" y="110" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">20 s / záznam</text>
     <line x1="340" y1="124" x2="340" y2="144" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
-    <!-- Step 2 -->
     <rect x="200" y="144" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
     <text x="340" y="164" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">2. Uloženie do regálu</text>
     <text x="340" y="182" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">15 s / záznam</text>
     <line x1="340" y1="196" x2="340" y2="216" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
-    <!-- Step 3 highlighted -->
     <rect x="200" y="216" width="280" height="52" rx="8" fill="#FCE8E8" stroke="#E24B4A" stroke-width="1.5"/>
     <text x="340" y="236" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#9B2C2C">3. Zozbieranie z portov ⚠</text>
     <text x="340" y="254" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#A32D2D">180 s / záz.  ·  83 % celkového času</text>
     <line x1="340" y1="268" x2="340" y2="288" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
-    <!-- Step 4 -->
     <rect x="200" y="288" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
     <text x="340" y="308" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">4. Skenovanie + paleta</text>
     <text x="340" y="326" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">8 s / záznam</text>
     <line x1="340" y1="340" x2="340" y2="360" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
-    <!-- Step 5 -->
     <rect x="200" y="360" width="280" height="52" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
     <text x="340" y="380" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#633806">5. Odvoz palety</text>
     <text x="340" y="398" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#854F0B">300 s / paletu  ·  fill faktor 70 %</text>
-    <!-- Result -->
     <rect x="200" y="432" width="280" height="36" rx="18" fill="#9B2C2C"/>
     <text x="340" y="450" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">Celk. náklady:  28 544 €  ·  693 338 Kč</text>
     </svg>
@@ -335,7 +329,6 @@ with tab_d2:
     <div style="overflow-x:auto">
     <div style="min-width:700px;padding:12px 0">
 
-    <!-- IT PRÍPRAVA -->
     <div style="border:1.5px dashed #666;border-radius:12px;padding:12px 16px 16px;margin-bottom:20px">
       <p style="font-size:11px;color:#888;margin:0 0 8px">Jednorazová príprava — pred spustením</p>
       <div style="background:#534AB7;border-radius:8px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:500;margin-bottom:12px">IT príprava systému</div>
@@ -352,73 +345,64 @@ with tab_d2:
       </div>
     </div>
 
-    <!-- OPERAČNÝ PROCES -->
     <div style="border:1.5px dashed #666;border-radius:12px;padding:12px 16px 16px">
       <p style="font-size:11px;color:#888;margin:0 0 8px">Opakovaný proces — každý deň</p>
       <div style="background:#085041;border-radius:8px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:500;margin-bottom:16px">Nový operačný proces — AS systém</div>
 
-      <!-- Step 1 -->
-      <div style="max-width:320px;margin:0 auto 12px;background:#F8FAF8;border:1px solid #ccc;border-radius:8px;padding:10px;text-align:center">
+        <div style="max-width:320px;margin:0 auto 12px;background:#F8FAF8;border:1px solid #ccc;border-radius:8px;padding:10px;text-align:center">
         <div style="font-size:13px;font-weight:500;color:#2d3748">1. Naskladnenie do AS</div>
         <div style="font-size:11px;color:#666;margin-top:3px">20 s / záznam — všetky záznamy</div>
       </div>
       <div style="text-align:center;color:#888;font-size:18px;margin-bottom:8px">↓</div>
 
-      <!-- Decision diamond via CSS clip -->
-      <div style="max-width:220px;margin:0 auto 8px;background:#F8F9FA;border:1px solid #aaa;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);padding:28px 20px;text-align:center">
+        <div style="max-width:220px;margin:0 auto 8px;background:#F8F9FA;border:1px solid #aaa;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);padding:28px 20px;text-align:center">
         <div style="font-size:13px;font-weight:500;color:#2d3748">Počet kusov?</div>
         <div style="font-size:11px;color:#666">limit AS</div>
       </div>
 
-      <!-- Branch labels -->
-      <div style="display:flex;justify-content:space-between;padding:0 40px;margin:4px 0 12px">
+        <div style="display:flex;justify-content:space-between;padding:0 40px;margin:4px 0 12px">
         <span style="font-size:11px;color:#085041;font-weight:500">← pod limit (KLT)</span>
         <span style="font-size:11px;color:#744210;font-weight:500">na limite / nad (Paleta) →</span>
       </div>
 
-      <!-- Two branches -->
       <div style="display:flex;gap:16px;align-items:flex-start">
-
-        <!-- KLT vetva -->
         <div style="flex:1;display:flex;flex-direction:column;gap:0">
           <div style="background:#085041;border-radius:6px 6px 0 0;padding:5px;text-align:center;font-size:11px;color:#9FE1CB;font-weight:500">KLT vetva</div>
           <div style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
             <div style="font-size:12px;font-weight:500;color:#085041">2. Pikovanie do BINu</div>
             <div style="font-size:11px;color:#0F6E56;margin-top:2px">8 s / záznam</div>
           </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">↓</div>
+          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">&#8595;</div>
           <div style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
             <div style="font-size:12px;font-weight:500;color:#085041">3. Sort nakládka</div>
             <div style="font-size:11px;color:#0F6E56;margin-top:2px">15 s / KLT</div>
           </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">↓</div>
+          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">&#8595;</div>
           <div style="background:#E1F5EE;border:1.5px solid #085041;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#085041">Dopravník ✓</div>
+            <div style="font-size:12px;font-weight:500;color:#085041">Dopravnik &#10003;</div>
             <div style="font-size:11px;color:#0F6E56;margin-top:2px">0 s odvoz</div>
           </div>
           <div style="margin-top:8px;background:#085041;border-radius:20px;padding:7px;text-align:center">
-            <span style="font-size:11px;color:#fff;font-weight:500">43 s + sort  ·  0 odvoz</span>
+            <span style="font-size:11px;color:#fff;font-weight:500">43 s + sort &nbsp;&#183;&nbsp; 0 odvoz</span>
           </div>
         </div>
-
-        <!-- Paleta vetva -->
         <div style="flex:1;display:flex;flex-direction:column;gap:0">
           <div style="background:#744210;border-radius:6px 6px 0 0;padding:5px;text-align:center;font-size:11px;color:#FCD34D;font-weight:500">Paleta vetva</div>
           <div style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#633806">2. Uloženie do regálu</div>
-            <div style="font-size:11px;color:#854F0B;margin-top:2px">15 s / záznam</div>
+            <div style="font-size:12px;font-weight:500;color:#633806">2. Ulozenie do regalu</div>
+            <div style="font-size:11px;color:#854F0B;margin-top:2px">15 s / zaznam</div>
           </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">↓</div>
+          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
           <div style="background:#FCE8E8;border:1px solid #F09595;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#9B2C2C">3. Zozbieranie ⚠</div>
-            <div style="font-size:11px;color:#A32D2D;margin-top:2px">180 s / záznam</div>
+            <div style="font-size:12px;font-weight:500;color:#9B2C2C">3. Zozbieranie &#9888;</div>
+            <div style="font-size:11px;color:#A32D2D;margin-top:2px">180 s / zaznam</div>
           </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">↓</div>
+          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
           <div style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
             <div style="font-size:12px;font-weight:500;color:#633806">4. Skenovanie</div>
-            <div style="font-size:11px;color:#854F0B;margin-top:2px">8 s / záznam</div>
+            <div style="font-size:11px;color:#854F0B;margin-top:2px">8 s / zaznam</div>
           </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">↓</div>
+          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
           <div style="background:#FAEEDA;border:1.5px solid #744210;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
             <div style="font-size:12px;font-weight:500;color:#633806">5. Odvoz palety</div>
             <div style="font-size:11px;color:#854F0B;margin-top:2px">300 s / paletu</div>
@@ -427,11 +411,9 @@ with tab_d2:
             <span style="font-size:11px;color:#fff;font-weight:500">223 s + odvoz pal.</span>
           </div>
         </div>
-
       </div>
 
-      <!-- Final result -->
-      <div style="margin-top:16px;background:#085041;border-radius:20px;padding:10px;text-align:center">
+        <div style="margin-top:16px;background:#085041;border-radius:20px;padding:10px;text-align:center">
         <span style="font-size:13px;color:#fff;font-weight:500">Úspora 8 498 €  ·  29,8 %</span>
       </div>
     </div>
