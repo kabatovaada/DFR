@@ -287,6 +287,141 @@ with col_costs:
     """, unsafe_allow_html=True)
 
 # ── Mini KPIs ──────────────────────────────────────────────────────────────────
+
+# ── Vývojové diagramy procesov ────────────────────────────────────────────────
+st.markdown('<p class="section-title">VÝVOJOVÉ DIAGRAMY PROCESOV</p>', unsafe_allow_html=True)
+
+tab_d1, tab_d2 = st.tabs(["🔴 Súčasný proces", "🟢 Nový proces"])
+
+with tab_d1:
+    st.markdown("""
+    <svg width="100%" viewBox="0 0 680 520" role="img" style="max-width:680px;display:block;margin:0 auto">
+    <title>Súčasný proces DFR — 5 krokov</title>
+    <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    <rect x="40" y="12" width="600" height="36" rx="8" fill="#9B2C2C"/>
+    <text x="340" y="30" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#FFFFFF">Súčasný proces — 5 krokov  ·  223 s / záz. + odvoz</text>
+    <!-- Step 1 -->
+    <rect x="200" y="72" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+    <text x="340" y="92" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">1. Naskladnenie + štítok</text>
+    <text x="340" y="110" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">20 s / záznam</text>
+    <line x1="340" y1="124" x2="340" y2="144" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
+    <!-- Step 2 -->
+    <rect x="200" y="144" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+    <text x="340" y="164" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">2. Uloženie do regálu</text>
+    <text x="340" y="182" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">15 s / záznam</text>
+    <line x1="340" y1="196" x2="340" y2="216" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
+    <!-- Step 3 highlighted -->
+    <rect x="200" y="216" width="280" height="52" rx="8" fill="#FCE8E8" stroke="#E24B4A" stroke-width="1.5"/>
+    <text x="340" y="236" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#9B2C2C">3. Zozbieranie z portov ⚠</text>
+    <text x="340" y="254" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#A32D2D">180 s / záz.  ·  83 % celkového času</text>
+    <line x1="340" y1="268" x2="340" y2="288" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
+    <!-- Step 4 -->
+    <rect x="200" y="288" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+    <text x="340" y="308" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">4. Skenovanie + paleta</text>
+    <text x="340" y="326" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">8 s / záznam</text>
+    <line x1="340" y1="340" x2="340" y2="360" stroke="#888" stroke-width="1" marker-end="url(#a1)"/>
+    <!-- Step 5 -->
+    <rect x="200" y="360" width="280" height="52" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="340" y="380" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#633806">5. Odvoz palety</text>
+    <text x="340" y="398" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#854F0B">300 s / paletu  ·  fill faktor 70 %</text>
+    <!-- Result -->
+    <rect x="200" y="432" width="280" height="36" rx="18" fill="#9B2C2C"/>
+    <text x="340" y="450" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">Celk. náklady:  28 544 €  ·  693 338 Kč</text>
+    </svg>
+    """, unsafe_allow_html=True)
+
+with tab_d2:
+    st.markdown("""
+    <svg width="100%" viewBox="0 0 680 980" role="img" style="max-width:680px;display:block;margin:0 auto">
+    <title>Nový proces DFR cez AS — IT príprava + operačný proces</title>
+    <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+    <!-- SEKCIA 1: IT príprava -->
+    <rect x="40" y="12" width="600" height="196" rx="12" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="5 4" opacity="0.4"/>
+    <text x="56" y="28" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#888">Jednorazová príprava — pred spustením</text>
+    <rect x="56" y="38" width="568" height="36" rx="8" fill="#534AB7"/>
+    <text x="340" y="56" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#FFFFFF">IT príprava systému</text>
+    <!-- IT krok 1 -->
+    <rect x="120" y="94" width="190" height="52" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+    <text x="215" y="114" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#3C3489">Nastavenie BINov</text>
+    <text x="215" y="132" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#534AB7">IT zmena konfigurácie</text>
+    <line x1="310" y1="120" x2="348" y2="120" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <!-- IT krok 2 -->
+    <rect x="348" y="94" width="210" height="52" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+    <text x="453" y="114" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#3C3489">Expedičná jobline</text>
+    <text x="453" y="132" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#534AB7">Vytvorenie v systéme</text>
+    <!-- Arrow to operational -->
+    <line x1="340" y1="180" x2="340" y2="230" stroke="#888" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#a2)" opacity="0.5"/>
+    <text x="356" y="208" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#888">systém pripravený</text>
+
+    <!-- SEKCIA 2: Operačný proces -->
+    <rect x="40" y="236" width="600" height="722" rx="12" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="5 4" opacity="0.4"/>
+    <text x="56" y="252" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#888">Opakovaný proces — každý deň</text>
+    <rect x="56" y="262" width="568" height="36" rx="8" fill="#085041"/>
+    <text x="340" y="280" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#FFFFFF">Nový operačný proces — AS systém</text>
+
+    <!-- Step 1 -->
+    <rect x="200" y="322" width="280" height="52" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+    <text x="340" y="342" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#444441">1. Naskladnenie do AS</text>
+    <text x="340" y="360" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">20 s / záznam — všetky záznamy</text>
+    <line x1="340" y1="374" x2="340" y2="394" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <!-- Decision -->
+    <polygon points="340,394 450,438 340,482 230,438" fill="#F8F9FA" stroke="#888" stroke-width="1" opacity="0.8"/>
+    <text x="340" y="432" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="14" font-weight="500" fill="#2d3748">Počet kusov?</text>
+    <text x="340" y="450" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#5F5E5A">limit AS</text>
+
+    <text x="138" y="476" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#888">pod limit</text>
+    <text x="542" y="476" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" fill="#888">na limite / nad</text>
+    <path d="M230 438 L120 438 L120 526" fill="none" stroke="#888" stroke-width="1" marker-end="url(#a2)" opacity="0.6"/>
+    <path d="M450 438 L560 438 L560 526" fill="none" stroke="#888" stroke-width="1" marker-end="url(#a2)" opacity="0.6"/>
+
+    <!-- KLT vetva -->
+    <text x="120" y="512" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#085041" font-weight="500">KLT vetva</text>
+    <rect x="48" y="526" width="144" height="52" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text x="120" y="546" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#085041">2. Pikovanie do BINu</text>
+    <text x="120" y="564" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#0F6E56">8 s / záz.</text>
+    <line x1="120" y1="578" x2="120" y2="596" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="48" y="596" width="144" height="52" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text x="120" y="616" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#085041">3. Sort nakládka</text>
+    <text x="120" y="634" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#0F6E56">15 s / KLT</text>
+    <line x1="120" y1="648" x2="120" y2="666" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="48" y="666" width="144" height="40" rx="8" fill="#E1F5EE" stroke="#085041" stroke-width="1"/>
+    <text x="120" y="686" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#085041">Dopravník ✓</text>
+    <line x1="120" y1="706" x2="120" y2="724" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="48" y="724" width="144" height="34" rx="17" fill="#085041"/>
+    <text x="120" y="741" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#FFFFFF">43 s + sort  ·  0 odvoz</text>
+
+    <!-- Paleta vetva -->
+    <text x="560" y="512" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#633806" font-weight="500">Paleta vetva</text>
+    <rect x="488" y="526" width="144" height="52" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="560" y="546" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#633806">2. Uloženie</text>
+    <text x="560" y="564" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">15 s / záznam</text>
+    <line x1="560" y1="578" x2="560" y2="596" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="488" y="596" width="144" height="52" rx="8" fill="#FCE8E8" stroke="#F09595" stroke-width="0.5"/>
+    <text x="560" y="616" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#9B2C2C">3. Zozbieranie</text>
+    <text x="560" y="634" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#A32D2D">180 s / záznam</text>
+    <line x1="560" y1="648" x2="560" y2="666" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="488" y="666" width="144" height="52" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="560" y="686" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#633806">4. Skenovanie</text>
+    <text x="560" y="704" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">8 s / záznam</text>
+    <line x1="560" y1="718" x2="560" y2="736" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="488" y="736" width="144" height="52" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="560" y="756" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#633806">5. Odvoz palety</text>
+    <text x="560" y="774" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">300 s / paletu</text>
+    <line x1="560" y1="788" x2="560" y2="806" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="488" y="806" width="144" height="34" rx="17" fill="#744210"/>
+    <text x="560" y="823" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#FFFFFF">223 s + odvoz pal.</text>
+
+    <!-- Merge -->
+    <path d="M120 758 L120 910 L338 910" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.3"/>
+    <path d="M560 840 L560 910 L342 910" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.3" marker-end="url(#a2)"/>
+    <rect x="200" y="920" width="280" height="38" rx="19" fill="#085041"/>
+    <text x="340" y="939" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">Úspora 8 498 €  ·  29,8 %</text>
+    </svg>
+    """, unsafe_allow_html=True)
+
+
 st.markdown('<p class="section-title">PREHĽAD OBJEMOV</p>', unsafe_allow_html=True)
 k1,k2,k3,k4,k5,k6,k7 = st.columns(7)
 for col, label, val, sub in [
