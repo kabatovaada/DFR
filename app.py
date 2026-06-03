@@ -326,113 +326,106 @@ with tab_d1:
 
 with tab_d2:
     st.markdown("""
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <tr>
-        <td colspan="3" style="padding:4px 0 2px;font-size:11px;color:#888">Jednorazov&#225; pr&#237;prava &#8212; pred spusten&#237;m</td>
-      </tr>
-      <tr>
-        <td colspan="3" style="background:#534AB7;color:#fff;font-weight:500;font-size:13px;text-align:center;padding:9px;border-radius:8px">IT pr&#237;prava syst&#233;mu</td>
-      </tr>
-      <tr>
-        <td style="width:45%;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px;text-align:center">
-          <div style="font-size:13px;font-weight:500;color:#3C3489">Nastavenie BINov</div>
-          <div style="font-size:11px;color:#534AB7;margin-top:3px">IT zmena konfigur&#225;cie</div>
-        </td>
-        <td style="width:10%;text-align:center;font-size:18px;color:#888">&#8594;</td>
-        <td style="width:45%;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px;text-align:center">
-          <div style="font-size:13px;font-weight:500;color:#3C3489">Expedi&#269;n&#225; jobline</div>
-          <div style="font-size:11px;color:#534AB7;margin-top:3px">Vytvorenie v syst&#233;me</div>
-        </td>
-      </tr>
-      <tr><td colspan="3" style="text-align:center;padding:6px;color:#888;font-size:11px">&#8595; syst&#233;m pripraven&#253;</td></tr>
-      <tr><td colspan="3" style="padding:4px 0 2px;font-size:11px;color:#888">Opakovan&#253; proces &#8212; ka&#382;d&#253; de&#328;</td></tr>
-      <tr>
-        <td colspan="3" style="background:#085041;color:#fff;font-weight:500;font-size:13px;text-align:center;padding:9px;border-radius:8px">Nov&#253; opera&#269;n&#253; proces &#8212; AS syst&#233;m</td>
-      </tr>
-      <tr><td colspan="3" style="text-align:center;padding:8px 0 4px">
-        <table style="margin:0 auto;border-collapse:collapse">
-          <tr><td style="background:#f8f9fa;border:1px solid #ccc;border-radius:8px;padding:10px 30px;text-align:center">
-            <div style="font-size:13px;font-weight:500;color:#2d3748">1. Naskladnenie do AS</div>
-            <div style="font-size:11px;color:#666;margin-top:3px">20 s / z&#225;znam &#8212; v&#353;etky z&#225;znamy</div>
-          </td></tr>
-        </table>
-      </td></tr>
-      <tr><td colspan="3" style="text-align:center;color:#888;padding:2px 0">&#8595;</td></tr>
-      <tr><td colspan="3" style="text-align:center;padding:4px 0">
-        <table style="margin:0 auto;border-collapse:collapse">
-          <tr><td style="background:#fffbe6;border:1.5px solid #f59f00;border-radius:8px;padding:12px 28px;text-align:center">
-            <div style="font-size:13px;font-weight:500;color:#2d3748">Po&#269;et kusov?</div>
-            <div style="font-size:11px;color:#666;margin-top:2px">limit AS</div>
-          </td></tr>
-        </table>
-      </td></tr>
-      <tr>
-        <td style="text-align:left;padding:4px 0;font-size:11px;color:#085041;font-weight:500">&#8592; pod limit (KLT)</td>
-        <td></td>
-        <td style="text-align:right;padding:4px 0;font-size:11px;color:#744210;font-weight:500">na limite / nad (Paleta) &#8594;</td>
-      </tr>
-      <tr style="vertical-align:top">
-        <td style="width:47%;padding-right:8px">
-          <table style="width:100%;border-collapse:collapse">
-            <tr><td style="background:#085041;color:#9FE1CB;font-size:11px;font-weight:500;text-align:center;padding:6px;border-radius:6px 6px 0 0">KLT vetva</td></tr>
-            <tr><td style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#085041">2. Pikovanie do BINu</div>
-              <div style="font-size:11px;color:#0F6E56;margin-top:2px">8 s / z&#225;znam</div>
-            </td></tr>
-            <tr><td style="background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
-            <tr><td style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#085041">3. Sort nakl&#225;dka</div>
-              <div style="font-size:11px;color:#0F6E56;margin-top:2px">15 s / KLT</div>
-            </td></tr>
-            <tr><td style="background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
-            <tr><td style="background:#E1F5EE;border:1.5px solid #085041;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#085041">Dopravn&#237;k &#10003;</div>
-              <div style="font-size:11px;color:#0F6E56;margin-top:2px">0 s odvoz</div>
-            </td></tr>
-            <tr><td style="padding-top:8px">
-              <div style="background:#085041;border-radius:20px;padding:7px;text-align:center">
-                <span style="font-size:11px;color:#fff;font-weight:500">43 s + sort &nbsp;&#183;&nbsp; 0 odvoz</span>
-              </div>
-            </td></tr>
-          </table>
-        </td>
-        <td style="width:6%;text-align:center;vertical-align:middle;color:#888;font-size:20px">|</td>
-        <td style="width:47%;padding-left:8px">
-          <table style="width:100%;border-collapse:collapse">
-            <tr><td style="background:#744210;color:#FCD34D;font-size:11px;font-weight:500;text-align:center;padding:6px;border-radius:6px 6px 0 0">Paleta vetva</td></tr>
-            <tr><td style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#633806">2. Ulo&#382;enie do reg&#225;lu</div>
-              <div style="font-size:11px;color:#854F0B;margin-top:2px">15 s / z&#225;znam</div>
-            </td></tr>
-            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
-            <tr><td style="background:#FCE8E8;border:1px solid #F09595;border-top:none;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#9B2C2C">3. Zozbieranie &#9888;</div>
-              <div style="font-size:11px;color:#A32D2D;margin-top:2px">180 s / z&#225;znam</div>
-            </td></tr>
-            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
-            <tr><td style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#633806">4. Skenovanie</div>
-              <div style="font-size:11px;color:#854F0B;margin-top:2px">8 s / z&#225;znam</div>
-            </td></tr>
-            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
-            <tr><td style="background:#FAEEDA;border:1.5px solid #744210;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
-              <div style="font-size:12px;font-weight:500;color:#633806">5. Odvoz palety</div>
-              <div style="font-size:11px;color:#854F0B;margin-top:2px">300 s / paletu</div>
-            </td></tr>
-            <tr><td style="padding-top:8px">
-              <div style="background:#744210;border-radius:20px;padding:7px;text-align:center">
-                <span style="font-size:11px;color:#fff;font-weight:500">223 s + odvoz pal.</span>
-              </div>
-            </td></tr>
-          </table>
-        </td>
-      </tr>
-      <tr><td colspan="3" style="padding-top:12px">
-        <div style="background:#085041;border-radius:20px;padding:10px;text-align:center">
-          <span style="font-size:13px;color:#fff;font-weight:500">&#218;spora 8 498 &#8364; &nbsp;&#183;&nbsp; 29,8 %</span>
-        </div>
-      </td></tr>
-    </table>
+    <svg width="100%" viewBox="0 0 680 820" role="img">
+    <title>Novy proces DFR cez AS</title>
+    <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+    <!-- IT priprava -->
+    <rect x="40" y="12" width="600" height="150" rx="10" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+    <text x="56" y="28" font-family="sans-serif" font-size="11" fill="#888">Jednorazova priprava</text>
+    <rect x="56" y="36" width="568" height="34" rx="7" fill="#534AB7"/>
+    <text x="340" y="53" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">IT priprava systemu</text>
+    <rect x="80" y="84" width="210" height="50" rx="7" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+    <text x="185" y="103" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#3C3489">Nastavenie BINov</text>
+    <text x="185" y="121" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#534AB7">IT zmena konfigurácie</text>
+    <line x1="290" y1="109" x2="328" y2="109" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+    <rect x="328" y="84" width="232" height="50" rx="7" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+    <text x="444" y="103" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#3C3489">Expedicna jobline</text>
+    <text x="444" y="121" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#534AB7">Vytvorenie v systeme</text>
+    <line x1="340" y1="162" x2="340" y2="182" stroke="#888" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#a2)" opacity="0.5"/>
+    <text x="356" y="174" font-family="sans-serif" font-size="11" fill="#888">system pripraveny</text>
+
+    <!-- Operacny proces header -->
+    <rect x="40" y="188" width="600" height="604" rx="10" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+    <text x="56" y="204" font-family="sans-serif" font-size="11" fill="#888">Opakovany proces</text>
+    <rect x="56" y="210" width="568" height="34" rx="7" fill="#085041"/>
+    <text x="340" y="227" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">Novy operacny proces — AS system</text>
+
+    <!-- Step 1 -->
+    <rect x="200" y="262" width="280" height="50" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+    <text x="340" y="281" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#444441">1. Naskladnenie do AS</text>
+    <text x="340" y="299" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#5F5E5A">20 s / zaznam — vsetky zaznamy</text>
+    <line x1="340" y1="312" x2="340" y2="330" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <!-- Decision diamond -->
+    <polygon points="340,330 430,366 340,402 250,366" fill="#FFFBE6" stroke="#F59F00" stroke-width="1.5"/>
+    <text x="340" y="360" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#2d3748">Pocet kusov?</text>
+    <text x="340" y="378" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#666">limit AS</text>
+
+    <!-- Branch labels -->
+    <text x="148" y="412" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#085041" font-weight="500">pod limit</text>
+    <text x="532" y="412" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#744210" font-weight="500">na limite / nad</text>
+    <path d="M250 366 L130 366 L130 440" fill="none" stroke="#888" stroke-width="1" marker-end="url(#a2)" opacity="0.6"/>
+    <path d="M430 366 L550 366 L550 440" fill="none" stroke="#888" stroke-width="1" marker-end="url(#a2)" opacity="0.6"/>
+
+    <!-- KLT vetva -->
+    <rect x="58" y="420" width="144" height="22" rx="5" fill="#085041"/>
+    <text x="130" y="431" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#9FE1CB">KLT vetva</text>
+
+    <rect x="58" y="440" width="144" height="50" rx="7" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text x="130" y="459" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#085041">2. Pikovanie do BINu</text>
+    <text x="130" y="477" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#0F6E56">8 s / zaznam</text>
+    <line x1="130" y1="490" x2="130" y2="506" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="58" y="506" width="144" height="50" rx="7" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text x="130" y="525" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#085041">3. Sort nakladka</text>
+    <text x="130" y="543" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#0F6E56">15 s / KLT</text>
+    <line x1="130" y1="556" x2="130" y2="572" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="58" y="572" width="144" height="50" rx="7" fill="#E1F5EE" stroke="#085041" stroke-width="1.5"/>
+    <text x="130" y="591" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#085041">Dopravnik</text>
+    <text x="130" y="609" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#0F6E56">0 s odvoz</text>
+    <line x1="130" y1="622" x2="130" y2="638" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="58" y="638" width="144" height="32" rx="16" fill="#085041"/>
+    <text x="130" y="654" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#FFFFFF">43 s + sort · 0 odvoz</text>
+
+    <!-- Paleta vetva -->
+    <rect x="478" y="420" width="144" height="22" rx="5" fill="#744210"/>
+    <text x="550" y="431" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#FCD34D">Paleta vetva</text>
+
+    <rect x="478" y="440" width="144" height="50" rx="7" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="550" y="459" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#633806">2. Ulozenie do regalu</text>
+    <text x="550" y="477" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">15 s / zaznam</text>
+    <line x1="550" y1="490" x2="550" y2="506" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="478" y="506" width="144" height="50" rx="7" fill="#FCE8E8" stroke="#F09595" stroke-width="0.5"/>
+    <text x="550" y="525" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#9B2C2C">3. Zozbieranie</text>
+    <text x="550" y="543" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#A32D2D">180 s / zaznam</text>
+    <line x1="550" y1="556" x2="550" y2="572" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="478" y="572" width="144" height="50" rx="7" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text x="550" y="591" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#633806">4. Skenovanie</text>
+    <text x="550" y="609" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">8 s / zaznam</text>
+    <line x1="550" y1="622" x2="550" y2="638" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="478" y="638" width="144" height="50" rx="7" fill="#FAEEDA" stroke="#744210" stroke-width="1.5"/>
+    <text x="550" y="657" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="12" font-weight="500" fill="#633806">5. Odvoz palety</text>
+    <text x="550" y="675" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" fill="#854F0B">300 s / paletu</text>
+    <line x1="550" y1="688" x2="550" y2="704" stroke="#888" stroke-width="1" marker-end="url(#a2)"/>
+
+    <rect x="478" y="704" width="144" height="32" rx="16" fill="#744210"/>
+    <text x="550" y="720" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="11" font-weight="500" fill="#FFFFFF">223 s + odvoz pal.</text>
+
+    <!-- Merge arrows -->
+    <path d="M130 670 L130 762 L338 762" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.4"/>
+    <path d="M550 736 L550 762 L342 762" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.4" marker-end="url(#a2)"/>
+
+    <!-- Final result -->
+    <rect x="200" y="772" width="280" height="34" rx="17" fill="#085041"/>
+    <text x="340" y="789" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="13" font-weight="500" fill="#FFFFFF">Uspora 8 498 EUR · 29,8 %</text>
+
+    </svg>
     """, unsafe_allow_html=True)
 
 
