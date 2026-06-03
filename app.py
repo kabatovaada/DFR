@@ -326,100 +326,113 @@ with tab_d1:
 
 with tab_d2:
     st.markdown("""
-    <div style="overflow-x:auto">
-    <div style="min-width:700px;padding:12px 0">
-
-    <div style="border:1.5px dashed #666;border-radius:12px;padding:12px 16px 16px;margin-bottom:20px">
-      <p style="font-size:11px;color:#888;margin:0 0 8px">Jednorazová príprava — pred spustením</p>
-      <div style="background:#534AB7;border-radius:8px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:500;margin-bottom:12px">IT príprava systému</div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div style="flex:1;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px 12px;text-align:center">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tr>
+        <td colspan="3" style="padding:4px 0 2px;font-size:11px;color:#888">Jednorazov&#225; pr&#237;prava &#8212; pred spusten&#237;m</td>
+      </tr>
+      <tr>
+        <td colspan="3" style="background:#534AB7;color:#fff;font-weight:500;font-size:13px;text-align:center;padding:9px;border-radius:8px">IT pr&#237;prava syst&#233;mu</td>
+      </tr>
+      <tr>
+        <td style="width:45%;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px;text-align:center">
           <div style="font-size:13px;font-weight:500;color:#3C3489">Nastavenie BINov</div>
-          <div style="font-size:11px;color:#534AB7;margin-top:3px">IT zmena konfigurácie</div>
+          <div style="font-size:11px;color:#534AB7;margin-top:3px">IT zmena konfigur&#225;cie</div>
+        </td>
+        <td style="width:10%;text-align:center;font-size:18px;color:#888">&#8594;</td>
+        <td style="width:45%;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:13px;font-weight:500;color:#3C3489">Expedi&#269;n&#225; jobline</div>
+          <div style="font-size:11px;color:#534AB7;margin-top:3px">Vytvorenie v syst&#233;me</div>
+        </td>
+      </tr>
+      <tr><td colspan="3" style="text-align:center;padding:6px;color:#888;font-size:11px">&#8595; syst&#233;m pripraven&#253;</td></tr>
+      <tr><td colspan="3" style="padding:4px 0 2px;font-size:11px;color:#888">Opakovan&#253; proces &#8212; ka&#382;d&#253; de&#328;</td></tr>
+      <tr>
+        <td colspan="3" style="background:#085041;color:#fff;font-weight:500;font-size:13px;text-align:center;padding:9px;border-radius:8px">Nov&#253; opera&#269;n&#253; proces &#8212; AS syst&#233;m</td>
+      </tr>
+      <tr><td colspan="3" style="text-align:center;padding:8px 0 4px">
+        <table style="margin:0 auto;border-collapse:collapse">
+          <tr><td style="background:#f8f9fa;border:1px solid #ccc;border-radius:8px;padding:10px 30px;text-align:center">
+            <div style="font-size:13px;font-weight:500;color:#2d3748">1. Naskladnenie do AS</div>
+            <div style="font-size:11px;color:#666;margin-top:3px">20 s / z&#225;znam &#8212; v&#353;etky z&#225;znamy</div>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td colspan="3" style="text-align:center;color:#888;padding:2px 0">&#8595;</td></tr>
+      <tr><td colspan="3" style="text-align:center;padding:4px 0">
+        <table style="margin:0 auto;border-collapse:collapse">
+          <tr><td style="background:#fffbe6;border:1.5px solid #f59f00;border-radius:8px;padding:12px 28px;text-align:center">
+            <div style="font-size:13px;font-weight:500;color:#2d3748">Po&#269;et kusov?</div>
+            <div style="font-size:11px;color:#666;margin-top:2px">limit AS</div>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr>
+        <td style="text-align:left;padding:4px 0;font-size:11px;color:#085041;font-weight:500">&#8592; pod limit (KLT)</td>
+        <td></td>
+        <td style="text-align:right;padding:4px 0;font-size:11px;color:#744210;font-weight:500">na limite / nad (Paleta) &#8594;</td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:47%;padding-right:8px">
+          <table style="width:100%;border-collapse:collapse">
+            <tr><td style="background:#085041;color:#9FE1CB;font-size:11px;font-weight:500;text-align:center;padding:6px;border-radius:6px 6px 0 0">KLT vetva</td></tr>
+            <tr><td style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#085041">2. Pikovanie do BINu</div>
+              <div style="font-size:11px;color:#0F6E56;margin-top:2px">8 s / z&#225;znam</div>
+            </td></tr>
+            <tr><td style="background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
+            <tr><td style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#085041">3. Sort nakl&#225;dka</div>
+              <div style="font-size:11px;color:#0F6E56;margin-top:2px">15 s / KLT</div>
+            </td></tr>
+            <tr><td style="background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
+            <tr><td style="background:#E1F5EE;border:1.5px solid #085041;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#085041">Dopravn&#237;k &#10003;</div>
+              <div style="font-size:11px;color:#0F6E56;margin-top:2px">0 s odvoz</div>
+            </td></tr>
+            <tr><td style="padding-top:8px">
+              <div style="background:#085041;border-radius:20px;padding:7px;text-align:center">
+                <span style="font-size:11px;color:#fff;font-weight:500">43 s + sort &nbsp;&#183;&nbsp; 0 odvoz</span>
+              </div>
+            </td></tr>
+          </table>
+        </td>
+        <td style="width:6%;text-align:center;vertical-align:middle;color:#888;font-size:20px">|</td>
+        <td style="width:47%;padding-left:8px">
+          <table style="width:100%;border-collapse:collapse">
+            <tr><td style="background:#744210;color:#FCD34D;font-size:11px;font-weight:500;text-align:center;padding:6px;border-radius:6px 6px 0 0">Paleta vetva</td></tr>
+            <tr><td style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#633806">2. Ulo&#382;enie do reg&#225;lu</div>
+              <div style="font-size:11px;color:#854F0B;margin-top:2px">15 s / z&#225;znam</div>
+            </td></tr>
+            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
+            <tr><td style="background:#FCE8E8;border:1px solid #F09595;border-top:none;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#9B2C2C">3. Zozbieranie &#9888;</div>
+              <div style="font-size:11px;color:#A32D2D;margin-top:2px">180 s / z&#225;znam</div>
+            </td></tr>
+            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
+            <tr><td style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#633806">4. Skenovanie</div>
+              <div style="font-size:11px;color:#854F0B;margin-top:2px">8 s / z&#225;znam</div>
+            </td></tr>
+            <tr><td style="background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;text-align:center;color:#888;padding:2px">&#8595;</td></tr>
+            <tr><td style="background:#FAEEDA;border:1.5px solid #744210;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
+              <div style="font-size:12px;font-weight:500;color:#633806">5. Odvoz palety</div>
+              <div style="font-size:11px;color:#854F0B;margin-top:2px">300 s / paletu</div>
+            </td></tr>
+            <tr><td style="padding-top:8px">
+              <div style="background:#744210;border-radius:20px;padding:7px;text-align:center">
+                <span style="font-size:11px;color:#fff;font-weight:500">223 s + odvoz pal.</span>
+              </div>
+            </td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr><td colspan="3" style="padding-top:12px">
+        <div style="background:#085041;border-radius:20px;padding:10px;text-align:center">
+          <span style="font-size:13px;color:#fff;font-weight:500">&#218;spora 8 498 &#8364; &nbsp;&#183;&nbsp; 29,8 %</span>
         </div>
-        <div style="font-size:18px;color:#888">→</div>
-        <div style="flex:1;background:#EEEDFE;border:1px solid #AFA9EC;border-radius:8px;padding:10px 12px;text-align:center">
-          <div style="font-size:13px;font-weight:500;color:#3C3489">Expedičná jobline</div>
-          <div style="font-size:11px;color:#534AB7;margin-top:3px">Vytvorenie v systéme</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="border:1.5px dashed #666;border-radius:12px;padding:12px 16px 16px">
-      <p style="font-size:11px;color:#888;margin:0 0 8px">Opakovaný proces — každý deň</p>
-      <div style="background:#085041;border-radius:8px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:500;margin-bottom:16px">Nový operačný proces — AS systém</div>
-
-        <div style="max-width:320px;margin:0 auto 12px;background:#F8FAF8;border:1px solid #ccc;border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:13px;font-weight:500;color:#2d3748">1. Naskladnenie do AS</div>
-        <div style="font-size:11px;color:#666;margin-top:3px">20 s / záznam — všetky záznamy</div>
-      </div>
-      <div style="text-align:center;color:#888;font-size:18px;margin-bottom:8px">↓</div>
-
-        <div style="max-width:220px;margin:0 auto 8px;background:#F8F9FA;border:1px solid #aaa;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);padding:28px 20px;text-align:center">
-        <div style="font-size:13px;font-weight:500;color:#2d3748">Počet kusov?</div>
-        <div style="font-size:11px;color:#666">limit AS</div>
-      </div>
-
-        <div style="display:flex;justify-content:space-between;padding:0 40px;margin:4px 0 12px">
-        <span style="font-size:11px;color:#085041;font-weight:500">← pod limit (KLT)</span>
-        <span style="font-size:11px;color:#744210;font-weight:500">na limite / nad (Paleta) →</span>
-      </div>
-
-      <div style="display:flex;gap:16px;align-items:flex-start">
-        <div style="flex:1;display:flex;flex-direction:column;gap:0">
-          <div style="background:#085041;border-radius:6px 6px 0 0;padding:5px;text-align:center;font-size:11px;color:#9FE1CB;font-weight:500">KLT vetva</div>
-          <div style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#085041">2. Pikovanie do BINu</div>
-            <div style="font-size:11px;color:#0F6E56;margin-top:2px">8 s / záznam</div>
-          </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">&#8595;</div>
-          <div style="background:#E1F5EE;border:1px solid #5DCAA5;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#085041">3. Sort nakládka</div>
-            <div style="font-size:11px;color:#0F6E56;margin-top:2px">15 s / KLT</div>
-          </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#E1F5EE;border-left:1px solid #5DCAA5;border-right:1px solid #5DCAA5;padding:2px">&#8595;</div>
-          <div style="background:#E1F5EE;border:1.5px solid #085041;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#085041">Dopravnik &#10003;</div>
-            <div style="font-size:11px;color:#0F6E56;margin-top:2px">0 s odvoz</div>
-          </div>
-          <div style="margin-top:8px;background:#085041;border-radius:20px;padding:7px;text-align:center">
-            <span style="font-size:11px;color:#fff;font-weight:500">43 s + sort &nbsp;&#183;&nbsp; 0 odvoz</span>
-          </div>
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:0">
-          <div style="background:#744210;border-radius:6px 6px 0 0;padding:5px;text-align:center;font-size:11px;color:#FCD34D;font-weight:500">Paleta vetva</div>
-          <div style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#633806">2. Ulozenie do regalu</div>
-            <div style="font-size:11px;color:#854F0B;margin-top:2px">15 s / zaznam</div>
-          </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
-          <div style="background:#FCE8E8;border:1px solid #F09595;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#9B2C2C">3. Zozbieranie &#9888;</div>
-            <div style="font-size:11px;color:#A32D2D;margin-top:2px">180 s / zaznam</div>
-          </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
-          <div style="background:#FAEEDA;border:1px solid #EF9F27;border-top:none;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#633806">4. Skenovanie</div>
-            <div style="font-size:11px;color:#854F0B;margin-top:2px">8 s / zaznam</div>
-          </div>
-          <div style="text-align:center;color:#888;font-size:14px;background:#FAEEDA;border-left:1px solid #EF9F27;border-right:1px solid #EF9F27;padding:2px">&#8595;</div>
-          <div style="background:#FAEEDA;border:1.5px solid #744210;border-top:none;border-radius:0 0 8px 8px;padding:10px;text-align:center">
-            <div style="font-size:12px;font-weight:500;color:#633806">5. Odvoz palety</div>
-            <div style="font-size:11px;color:#854F0B;margin-top:2px">300 s / paletu</div>
-          </div>
-          <div style="margin-top:8px;background:#744210;border-radius:20px;padding:7px;text-align:center">
-            <span style="font-size:11px;color:#fff;font-weight:500">223 s + odvoz pal.</span>
-          </div>
-        </div>
-      </div>
-
-        <div style="margin-top:16px;background:#085041;border-radius:20px;padding:10px;text-align:center">
-        <span style="font-size:13px;color:#fff;font-weight:500">Úspora 8 498 €  ·  29,8 %</span>
-      </div>
-    </div>
-
-    </div>
-    </div>
+      </td></tr>
+    </table>
     """, unsafe_allow_html=True)
 
 
